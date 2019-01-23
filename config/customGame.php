@@ -7,21 +7,18 @@
  */
 return [
     'project' => [
-        'xxoo_yhsy' => [
+        'yhsy' => [
             'name'=> '永恒神域',
             'config' => '',
             ],
-        'xxoo_sjjy' => [
+        'sjjy' => [
             'name'=> '圣剑纪元',
             'config' => '',
         ],
-        'xxoo_sjhp' => [
-            'name'=> '圣剑换皮',
+        'sjxx' => [
+            'name'=> '圣剑仙侠',
             'config' => '',
         ],
 
-    ]
-
-
-
+    ],
 ];

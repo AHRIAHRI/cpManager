@@ -10,9 +10,15 @@ namespace App\Http\Controllers\Api ;
 
 
 use \App\Http\Controllers\Controller;
+use App\Models\Menu;
 
 
-class SysContorller extends Controller {
+/**
+ * Class CommonController
+ * @package App\Http\Controllers\Api
+ * 公共类库，
+ */
+class CommonController extends Controller {
 
     public function allProject(){
         $projects = config('customGame.project');
@@ -29,7 +35,15 @@ class SysContorller extends Controller {
         // 处理服务器逻辑 获取username
 
         return 'success' ;
-//        return 'permissionIsNotDefined' ;
+        return 'permissionIsNotDefined' ;
+    }
+    public function test(Menu $util){
+//        dump($util->listAllPanel());
+        return  11111111111;
+    }
+
+    public function menu(Menu $menu){
+        return  $menu->showMenu();
     }
 
 
