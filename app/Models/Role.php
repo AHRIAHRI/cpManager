@@ -19,8 +19,8 @@ class Role extends Model
   `role` char(64) NOT NULL,
   `project` char(64) NOT NULL,
   `nickName` char(64) NOT NULL,
-  `platAndChannel` text NOT NULL,
   `actionPermissions` text NOT NULL,
+
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)

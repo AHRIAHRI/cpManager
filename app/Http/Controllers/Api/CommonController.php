@@ -24,7 +24,7 @@ class CommonController extends Controller {
         $projects = config('customGame.project');
         $result = [] ;
         foreach ($projects as $project => $items){
-            $result[] = ['name'=> $items['name'],'code'=>$project];
+            $result[] = ['projectName'=> $items['name'],'projectCode'=>$project];
         }
 //        return 'permissionIsNotDefined' ;
         return $result;

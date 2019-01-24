@@ -14,7 +14,7 @@ class UserAssets extends Model
 //    protected $connection = 'connection-name';
 
 /*
- * CREATE TABLE `userAssets` (
+ * CREATE TABLE ` ` (
   `user` char(64) NOT NULL COMMENT '用户名',
   `selectProject` char(64) NOT NULL COMMENT '选择的项目',
   `allProject` varchar(1024) NOT NULL COMMENT '可以使用的所有项目',

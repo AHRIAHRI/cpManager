@@ -116,8 +116,8 @@ return [
                 ],
                 ['alias'=>'用户设置','addr'=>'/sys/useSet','interface' =>
                     [
-                        [['post'],'/userInfoList','userInfoList'],
-                        [['post','get'],'/changeInfo','changeInfo'],
+                        [['post'],'/userInfoList','userInfoList'],      // 返回用户的信息
+                        [['post','get'],'/changeInfo','changeInfo'],    // 提交用户的信息
                     ]
                 ],
                 ['alias'=>'日志翻译','addr'=>'/sys/render','interface' =>

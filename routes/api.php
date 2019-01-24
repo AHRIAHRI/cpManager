@@ -22,7 +22,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::prefix('v1')
     ->group(function (){
-        Route::post('/login', 'Api\JwtController@login');
+        Route::post('/login', 'Api\UserController@login');
     });
 
 Route::prefix('v1')
