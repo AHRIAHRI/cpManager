@@ -11,6 +11,11 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+    public function userAssets(){
+        return $this->hasOne('App\Models\UserAssets','user','name');
+    }
+
+
 
     /**
      * The attributes that are mass assignable.

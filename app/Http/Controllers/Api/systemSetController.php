@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\UserAssets ;
+use App\Models\Role ;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,19 +22,60 @@ class systemSetController extends Controller
 
     /**
      * -----------------------------------------------------------------------------------------------
-     * 用户设置 页面相关接口
-
+     * 角色管理 页面相关接口
+     * TODO 用户的每一次请求都需要被记录下来
      * -----------------------------------------------------------------------------------------------
      *
      */
 
     /**
-     * roleList 角色列表 ，
-     * userList 用户列表 ，
-     * platChannelData 平台和渠道列表 ，
+     * 针对单一的项目组 ，也就用户所选着的项目
+     * roleList 角色列表 ，其中包含的信息 [角色名 roleName，中文名roleAlias，查看和修改权限列表(列表)modifyAcl]
+     * userList 用户列表 ，其中包含的信息 [账号，电话，角色分配归属(列表)，项目权限(列表)]
      */
-    public function roleUserInfo(Menu $menu){
-        return  ['allPermisssion' => $menu-> listAllPanel()];
+    public function roleUserInfo(Request $request){
+        $selectProject = $request->user()->userAssets->selectProject;
+
+        // 处理角色返回
+        $roleInfo = [];
+        foreach (Role::where('project',$selectProject) as $signRole){
+            // 计算出role的权限
+            $modifyAcl = [];
+            // 数据库中角色的权限,arr格式
+            $actionPermissions = $signRole->actionPermissions;
+            if($actionPermissions){
+                // role 没有任何权限的情况下 ，所有菜单栏返回false
+            }else{
+                // role 有一部分权限，计算出所有的false or true
+                $ownerPermission = json_decode($actionPermissions,true);
+
+            }
+
+            $roleInfo[] = ['roleName'=>$signRole->role,'roleAlias'=>$signRole->nickName,'modifyAcl'=>$modifyAcl];
+        };
+
+        // 处理用户列表返回
+        $userInfo = [] ;
+
+        $userAssetsModels = [] ;  // 拥有该项目的用户userAssets模型
+        foreach (UserAssets::all() as $userAssets){
+            $tempUserOwner = [];
+            foreach (json_decode($userAssets->allProject,true) as $userOwnerPorject){
+                $tempUserOwner[] = $userOwnerPorject['projectCode'];
+            };
+            if(in_array($selectProject,$tempUserOwner)){
+                $userAssetsModels[] = $userAssetsModels ;
+            }
+        }
+
+        foreach ($userAssetsModels as $assets ){
+
+            $user = explode(',',$assets->roles);  // 用户拥有的角色 TODO 格式有点问题,应该是json键值项目对于的角色.
+
+            $userInfo[] = ['userName'=>$assets->user,'tel'=>'','platAndChannel'=>'','userRole'=>''];
+        }
+
+        return  ['roleList' =>'','userList'=>''];
     }
 
     /**
@@ -48,6 +90,7 @@ class systemSetController extends Controller
         if($data['password']  != $data['passwdCheck'] ){
             return ['error'=>'密码不一致'] ;
         }
+        // TODO 同样也在userAssets里面添加一条记录
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -59,7 +102,28 @@ class systemSetController extends Controller
     public function userdel(){
 
     }
-    public function roleadd(){
+
+    /**
+     * 处理添加角色逻辑
+     */
+    public function roleadd(Request $request){
+
+        $project = $request->user()->userAssets->selectProject;
+//        dump($request->user()->userAssets);
+        if(!$project){
+            return  ['status'=>false,'mesg'=>'请先选着一个项目再操作'];
+        }
+        $roleName = $request->roleName;
+        $nickName = $request->alias;
+
+        // TODO 检查是否合法
+
+        $role = new Role();
+        $role->role = $roleName;
+        $role->project = $project;
+        $role->nickName = $nickName;
+        $role->actionPermissions = '';
+        return ['status'=>$role->save(),'mesg'=>''];
 
     }
     public function roledel(){
@@ -103,14 +167,41 @@ class systemSetController extends Controller
     /**
      * @return array
      * 提交修改
-     * TODO 选着项目的同时 把选着写入本地
+     * TODO 选着项目的同时 把选着写入本地localStorage
      */
-    public function changeInfo(){
-        $tel = request()->tel;
-        $selectProject = request()->selectProject;
-        $passwd = request()->passwd;
-        $user = request()->user()->name;
-        return  ['abc'=>[$user,$tel,$selectProject,$passwd]];
+    public function changeInfo(Request $request){
+        $tel = $request->tel;
+        $selectProject = $request->selectProject;
+        $passwd = $request->passwd;
+        $userModel = $request->user();
+
+        // 修改密码 TODO 判断密码的长度
+        $passwdStatus = '';
+        if($passwd) {
+            $userModel->password = Hash::make($passwd);
+            $passwdStatus = $userModel->save();
+        }
+        // 修改手机号 TODO 判断手机号码是否规范
+        $telStatus ='';
+        if($tel){
+            $userModel->email = $tel;
+            $telStatus = $userModel->save();
+        }
+        // 修改选着的项目
+        $selectProjectStatus = '';
+        if($selectProject){
+            $userAssets = \App\Models\UserAssets::find($userModel->name);
+            $allProject = $userAssets->allProject;
+            $temp = [];
+            foreach (json_decode($allProject,true) as $items){
+                $temp [] = $items['projectCode'];
+            }
+            if(in_array($selectProject,$temp)) {
+                $userAssets->selectProject = $selectProject;
+                $selectProjectStatus = $userAssets->save();
+            }
+        }
+        return  compact('passwdStatus','telStatus','selectProjectStatus');
     }
 
 
@@ -221,6 +312,7 @@ class systemSetController extends Controller
             }
         }
         $currentAssets->allProject = json_encode($insert);
+        $currentAssets->selectProject = '';
         return ['status'=>$currentAssets->save()];
     }
 

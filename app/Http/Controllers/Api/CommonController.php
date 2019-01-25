@@ -29,6 +29,16 @@ class CommonController extends Controller {
 //        return 'permissionIsNotDefined' ;
         return $result;
     }
+
+    public function kvAllProject(){
+        $projects = config('customGame.project');
+        $result = [] ;
+        foreach ($projects as $project => $items){
+            $result[$project] = $items['name'];
+        }
+//        return 'permissionIsNotDefined' ;
+        return $result;
+    }
     public function changeSelect(){
         $select = request('select');
 
