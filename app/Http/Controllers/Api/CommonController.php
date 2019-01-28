@@ -47,9 +47,9 @@ class CommonController extends Controller {
         return 'success' ;
         return 'permissionIsNotDefined' ;
     }
-    public function test(Menu $util){
-//        dump($util->listAllPanel());
-        return  11111111111;
+    public function test(Menu $menu){
+        dump($menu->listAllPanel());
+
     }
 
     public function menu(Menu $menu){

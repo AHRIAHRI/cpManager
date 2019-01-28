@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Menu;
 use App\Models\UserAssets ;
 use App\Models\Role ;
 use App\User;
@@ -15,8 +16,8 @@ class systemSetController extends Controller
     /**
      * 列出菜单栏中所有的项目和权限
      */
-    public function showRbac(Menu $util){
-        return $util->listAllPanel();
+    public function showRbac(Menu $Menu){
+        return $Menu->listAllPanel();
     }
 
 
@@ -32,50 +33,63 @@ class systemSetController extends Controller
      * 针对单一的项目组 ，也就用户所选着的项目
      * roleList 角色列表 ，其中包含的信息 [角色名 roleName，中文名roleAlias，查看和修改权限列表(列表)modifyAcl]
      * userList 用户列表 ，其中包含的信息 [账号，电话，角色分配归属(列表)，项目权限(列表)]
+     *
      */
-    public function roleUserInfo(Request $request){
+    public function roleUserInfo(Request $request,Menu $menu){
+        // 管理员自己选着的项目;
         $selectProject = $request->user()->userAssets->selectProject;
 
         // 处理角色返回
         $roleInfo = [];
-        foreach (Role::where('project',$selectProject) as $signRole){
-            // 计算出role的权限
-            $modifyAcl = [];
-            // 数据库中角色的权限,arr格式
+        foreach (Role::where('project',$selectProject)->get() as $signRole){
+            $modifyAcl = $menu->listAllPanel();
+            // 数据库中角色的权限,arr格式,如果有权限，则存在数据库中，不存在则代表没有权限
             $actionPermissions = $signRole->actionPermissions;
             if($actionPermissions){
-                // role 没有任何权限的情况下 ，所有菜单栏返回false
-            }else{
-                // role 有一部分权限，计算出所有的false or true
+                // 计算出权限
                 $ownerPermission = json_decode($actionPermissions,true);
-
+                foreach ($modifyAcl as $key1 => $items1){
+                    foreach ($items1['subMenu'] as $key2 => $item2 ){
+                        if(in_array($item2[0],$ownerPermission)){
+                            $modifyAcl[$key1]['subMenu'][$key2][2] = true ;
+                        }
+                    }
+                }
             }
-
             $roleInfo[] = ['roleName'=>$signRole->role,'roleAlias'=>$signRole->nickName,'modifyAcl'=>$modifyAcl];
         };
 
         // 处理用户列表返回
         $userInfo = [] ;
-
         $userAssetsModels = [] ;  // 拥有该项目的用户userAssets模型
+        $roles = new Role();
+        $projectRoles = $roles->getProjectAllRole($selectProject);
         foreach (UserAssets::all() as $userAssets){
             $tempUserOwner = [];
             foreach (json_decode($userAssets->allProject,true) as $userOwnerPorject){
                 $tempUserOwner[] = $userOwnerPorject['projectCode'];
             };
             if(in_array($selectProject,$tempUserOwner)){
-                $userAssetsModels[] = $userAssetsModels ;
+                $userAssetsModels[] = $userAssets ;
             }
         }
 
-        foreach ($userAssetsModels as $assets ){
+        foreach ($userAssetsModels as $assets){
+//            dump($assets);
+            $finalRoleFormate = []; //最终计算出来的授权格式;
+            $userRole = $assets->parseRoleByProject($selectProject);
+            foreach ($projectRoles as $role => $nickName){
+                if(in_array($role,$userRole)){
+                    $finalRoleFormate[]=['role'=>$role,'status'=>true,'roleName'=>$nickName];
+                }else{
+                    $finalRoleFormate[]=['role'=>$role,'status'=>false,'roleName'=>$nickName];
+                }
+            }
 
-            $user = explode(',',$assets->roles);  // 用户拥有的角色 TODO 格式有点问题,应该是json键值项目对于的角色.
-
-            $userInfo[] = ['userName'=>$assets->user,'tel'=>'','platAndChannel'=>'','userRole'=>''];
+            $userInfo[] = ['userName'=>$assets->user,'tel'=>'','platAndChannel'=>'','userRole'=>$finalRoleFormate];
         }
 
-        return  ['roleList' =>'','userList'=>''];
+        return  ['roleList'=>$roleInfo ,'userList'=>$userInfo];
     }
 
     /**
@@ -129,12 +143,37 @@ class systemSetController extends Controller
     public function roledel(){
 
     }
-    public function modifyOtherPasswd(){
+    public function modifyOtherPasswd(Request $request ){
 
     }
-    public function modifyRolePermission(){
+
+    /**
+     * @param Request $request
+     * @return mixed
+     * TODO 检测输入是否合法
+     */
+    public function modifyRolePermission(Request $request ){
+        $project = $request->user()->userAssets->selectProject;
+        $role = $request->role;
+        $newAcl = $request->newAcl;
+
+        $ownerAcl = [];
+        foreach ($newAcl as $value){
+            foreach ($value['subMenu'] as $item){
+                if($item[2]){
+                    $ownerAcl[] = $item[0];
+                }
+            }
+        }
+        $status = true;
+        if($ownerAcl) {
+            $status = \App\Models\Role::where('role', $role)->where('project', $project)->update(['actionPermissions'=>json_encode($ownerAcl)]);
+        }
+
+        return ['status'=>$status];
 
     }
+
     public function modifyUserPermission(){
 
     }

@@ -54,27 +54,36 @@ class Menu
     }
 
     /**
-     * 列出所有的功能面板提供给 master 授权
+     * 拼凑出授权的格式 默认全部为 false
+     *  [
+     *      {menu:'充值分析',subMenu:[
+     *      ['/data/game/payer','物品货币',false],
+     *      ['/data/game/payer','商城分析',true],
+     *      ['/data/game/money','回本分析',true],
+     *      ]
+     *      },
+     *      {menu:'详细日志',subMenu:[['/data/log/daily','充值日志',true]]},
+     * ]
      */
     public function listAllPanel(){
         $return = [];
         foreach ($this->menu as $items){
             $temp = [];
             foreach ($items['subMeun'] as  $item1){
-                $temp[] = [$item1['addr']=>$item1['alias']];
+                $temp[] = [$item1['addr'],$item1['alias'],false];
             }
-            $return[$items['name']][] = ['name'=>$items['alias'],'sub'=>$temp];
+            $return[] = ['menu'=>$items['alias'],'subMenu'=> $temp];
         }
         return $return;
     }
-    /*
-     *
+
+    /**
+     * @return \Illuminate\Config\Repository|mixed 用户加载的菜单栏
+     * TODO 检查用户的菜单栏授权
      */
     public function showMenu(){
         $menu = $this->menu;
         foreach ($menu as $key => $item){
-//            dump($menu[$key]['subMeun']['interface']);
-
             foreach ($menu[$key]['subMeun'] as $key2 =>$values){
                 unset($menu[$key]['subMeun'][$key2]['interface']);
             }
