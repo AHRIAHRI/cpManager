@@ -111,7 +111,7 @@ return [
                         [['post'],'/roledel','roleDel'],
                         [['post'],'/modifyOtherPasswd','modifyOtherPasswd'],
                         [['post'],'/modifyRolePermission','modifyRolePermission'],
-                        [['post'],'/modifyUserPermission','modifyUserPermission'],
+                        [['post'],'/modifyUserOwnerRoles','modifyUserOwnerRoles'],
                     ]
                 ],
                 ['alias'=>'用户设置','addr'=>'/sys/useSet','interface' =>

@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+
 use App\Models\Menu;
 use App\Models\UserAssets ;
+use App\Models\Rbac ;
 use App\Models\Role ;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Nexmo\Client\Exception\Exception;
 
 class systemSetController extends Controller
 {
@@ -56,7 +59,12 @@ class systemSetController extends Controller
                     }
                 }
             }
-            $roleInfo[] = ['roleName'=>$signRole->role,'roleAlias'=>$signRole->nickName,'modifyAcl'=>$modifyAcl];
+            $roleInfo[] = [
+                'roleName' => $signRole->role,
+                'roleAlias' => $signRole->nickName,
+                'modifyAcl' => $modifyAcl
+
+            ];
         };
 
         // 处理用户列表返回
@@ -75,57 +83,73 @@ class systemSetController extends Controller
         }
 
         foreach ($userAssetsModels as $assets){
-//            dump($assets);
             $finalRoleFormate = []; //最终计算出来的授权格式;
             $userRole = $assets->parseRoleByProject($selectProject);
-            foreach ($projectRoles as $role => $nickName){
-                if(in_array($role,$userRole)){
-                    $finalRoleFormate[]=['role'=>$role,'status'=>true,'roleName'=>$nickName];
-                }else{
-                    $finalRoleFormate[]=['role'=>$role,'status'=>false,'roleName'=>$nickName];
+            if ($projectRoles) {
+                foreach ($projectRoles as $role => $nickName) {
+                    if (in_array($role, $userRole)) {
+                        $finalRoleFormate[] = [
+                            'role' => $role,
+                            'status' => true,
+                            'roleName' => $nickName
+                        ];
+                    } else {
+                        $finalRoleFormate[] = [
+                            'role' => $role,
+                            'status' => false,
+                            'roleName' => $nickName
+                        ];
+                    }
                 }
             }
-
-            $userInfo[] = ['userName'=>$assets->user,'tel'=>'','platAndChannel'=>'','userRole'=>$finalRoleFormate];
+            $userInfo[] = [
+                'userName' => $assets->user,
+                'tel' => $assets->userModel->email,
+                'platAndChannel' => '',
+                'userRole' => $finalRoleFormate
+            ];
         }
 
-        return  ['roleList'=>$roleInfo ,'userList'=>$userInfo];
+        return ['roleList' => $roleInfo ,'userList' => $userInfo];
     }
 
     /**
      * 添加一个用户
      * @return
+     * TODO 不相信所有外来数据，对所有数据做过滤
      */
-    public function userAdd(){
-        $data['name'] = request() -> UserName;
-        $data['email'] = request() -> tel;
-        $data['password'] = request() -> passwd;
-        $data['passwdCheck'] = request() -> passwdCheck;
+    public function userAdd(UserAssets $UserAssets){
+        $data['name'] = request()->UserName;
+        $data['email'] = request()->tel;
+        $data['password'] = request()->passwd;
+        $data['passwdCheck'] = request()->passwdCheck;
         if($data['password']  != $data['passwdCheck'] ){
-            return ['error'=>'密码不一致'] ;
+            return ['error' => '密码不一致'] ;
         }
         // TODO 同样也在userAssets里面添加一条记录
-        return User::create([
+        return $UserAssets->createRecord($data['name']) ? User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
 
-        ]);
+        ]) : false;
     }
 
-    public function userdel(){
+    public function userDel(){
 
     }
 
     /**
      * 处理添加角色逻辑
      */
-    public function roleadd(Request $request){
+    public function roleAdd(Request $request){
 
         $project = $request->user()->userAssets->selectProject;
-//        dump($request->user()->userAssets);
         if(!$project){
-            return  ['status'=>false,'mesg'=>'请先选着一个项目再操作'];
+            return  [
+                'status' => false,
+                'mesg' => '请先选着一个项目再操作'
+            ];
         }
         $roleName = $request->roleName;
         $nickName = $request->alias;
@@ -137,7 +161,10 @@ class systemSetController extends Controller
         $role->project = $project;
         $role->nickName = $nickName;
         $role->actionPermissions = '';
-        return ['status'=>$role->save(),'mesg'=>''];
+        return [
+            'status' => $role->save(),
+            'mesg' => ''
+        ];
 
     }
     public function roledel(){
@@ -174,7 +201,19 @@ class systemSetController extends Controller
 
     }
 
-    public function modifyUserPermission(){
+    public function modifyUserOwnerRoles(Request $request ){
+        // TODO 检验输入是否合格
+        $select = $request->select;
+        $user = $request->user;
+        $project = $request->user()->userAssets->selectProject;
+        $insert = [];
+        foreach ($select as $item){
+            if($item['status']){
+                $insert[] = $item['role'];
+            }
+        }
+        return ['status' => UserAssets::find($user)->updateRoleByProject($project,$insert)];
+
 
     }
 
@@ -194,7 +233,7 @@ class systemSetController extends Controller
      */
     public function userInfoList(){
         $result = [] ;
-        $allPorject = \App\Models\UserAssets::find(request()->user()->name)->allProject;
+        $allPorject = UserAssets::find(request()->user()->name)->allProject;
         if($allPorject) {
             foreach (json_decode($allPorject,true) as $project) {
                 $result[] = ['projectName' => $project['projectName'], 'projectCode' => $project['projectCode']];
@@ -229,7 +268,7 @@ class systemSetController extends Controller
         // 修改选着的项目
         $selectProjectStatus = '';
         if($selectProject){
-            $userAssets = \App\Models\UserAssets::find($userModel->name);
+            $userAssets = UserAssets::find($userModel->name);
             $allProject = $userAssets->allProject;
             $temp = [];
             foreach (json_decode($allProject,true) as $items){
@@ -323,6 +362,7 @@ class systemSetController extends Controller
         $currentData = $currentAssets->allProject;
         // 如果数据中存在记录
         $insert = [];
+        $finalOwner = [] ;  // 所有已经选的项目
         if($currentData){
             $allProjctRecoed = json_decode($currentData,true);
             $temp = [];
@@ -339,20 +379,27 @@ class systemSetController extends Controller
                         unset($requesItem['owner']);
                         $insert[] = $requesItem;
                     }
+                    $finalOwner[] = $requesItem['projectCode'] ;
                 }
             }
         // 否则直接插入为真的数据
         }else{
-            foreach ($requesData as $item) {
-                if($item['owner']){
-                    unset($item['owner']);
-                    $insert [] = $item;
+            foreach ($requesData as $requesItem) {
+                if($requesItem['owner']){
+                    unset($requesItem['owner']);
+                    $insert [] = $requesItem;
+                    $finalOwner[] = $requesItem['projectCode'] ;
                 }
             }
         }
         $currentAssets->allProject = json_encode($insert);
-        $currentAssets->selectProject = '';
-        return ['status'=>$currentAssets->save()];
+        // 如果有选择了,并且这个项目不在其中,重置了他的选着
+        if($currentAssets->selectProject && !in_array($currentAssets->selectProject,$finalOwner)){
+            $currentAssets->selectProject = '';
+        }
+        return [
+            'status' => $currentAssets->save()
+        ];
     }
 
     /**

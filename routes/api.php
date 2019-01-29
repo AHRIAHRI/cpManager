@@ -26,7 +26,7 @@ Route::prefix('v1')
     });
 
 Route::prefix('v1')
-    ->middleware('jwt.auth')
+//    ->middleware('jwt.auth')
     ->group(function () {
         Route::match(['post','get'],'/menu', 'Api\CommonController@menu');
 

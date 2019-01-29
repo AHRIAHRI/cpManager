@@ -91,5 +91,17 @@ class Menu
         return $menu;
     }
 
+    /**
+     * @return array
+     * 配置的菜单栏中整理出一个页面对应的接口
+     */
+    public function menuMpaInterface(){
+        $menu = $this->menu;
+        foreach ($menu as $key => $item){
+
+        }
+        return [];
+    }
+
 
 }
