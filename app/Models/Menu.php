@@ -79,29 +79,36 @@ class Menu
 
     /**
      * @return \Illuminate\Config\Repository|mixed 用户加载的菜单栏
-     * TODO 检查用户的菜单栏授权
      */
     public function showMenu(){
         $menu = $this->menu;
+        $newMenu = [] ;
+        $finalPermission = request()->user()->userAssets->userOwnerPermission() ;
+        // 用户如果没有权限，则返回空
+        if(empty($finalPermission)){
+            return [];
+        }
         foreach ($menu as $key => $item){
+            $temp = [];
             foreach ($menu[$key]['subMeun'] as $key2 =>$values){
                 unset($menu[$key]['subMeun'][$key2]['interface']);
+                if(in_array($values['addr'],$finalPermission)){
+                    // 这里比较隐秘的bug，unset 在销毁字数索引的values时候,不销毁key,导致转化成对象的时候出现问题
+                    // unset($menu[$key]['subMeun'][$key2])
+                    $temp[] = $menu[$key]['subMeun'][$key2];
+                }
+            }
+            $menu[$key]['subMeun'] = $temp;
+        }
+        // 没有选项的菜单栏不予返回显示
+        foreach ($menu as $value3){
+            if($value3['subMeun']){
+                $newMenu [] = $value3 ;
             }
         }
-        return $menu;
+        return $newMenu;
     }
 
-    /**
-     * @return array
-     * 配置的菜单栏中整理出一个页面对应的接口
-     */
-    public function menuMpaInterface(){
-        $menu = $this->menu;
-        foreach ($menu as $key => $item){
-
-        }
-        return [];
-    }
 
 
 }

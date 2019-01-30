@@ -24,17 +24,23 @@ Route::prefix('v1')
     ->group(function (){
         Route::post('/login', 'Api\UserController@login');
     });
+Route::prefix('v1')
+    ->middleware('jwt.auth')
+    ->group(function () {
+        Route::match(['post'], '/menu', 'Api\CommonController@menu');
+        Route::match(['post'], '/sys/useSet/userInfoList', 'Api\systemSetController@userInfoList');
+        Route::match(['post'], '/sys/useSet/changeInfo', 'Api\systemSetController@changeInfo');
+        }
+    );
 
 Route::prefix('v1')
-//    ->middleware('jwt.auth')
+    ->middleware(['jwt.auth','CheckPermission'])
     ->group(function () {
-        Route::match(['post','get'],'/menu', 'Api\CommonController@menu');
-
         // 注册所有的菜单路由
         $util = new Menu();
         $util -> registerRoute();
     });
-Route::get('/test','Api\CommonController@test');
+//Route::get('/test','Api\CommonController@test');
 
 
 

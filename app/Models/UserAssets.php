@@ -35,20 +35,34 @@ class UserAssets extends Model
      * 1)在中间件中判断用户是否有权限对接口进行请求
      * 2)在Menu中过滤，只是显示用户拥有的权限
      */
-    public function getUserRbacByProject($key){
+    public function getUserPermissionByProject($key){
         $roles = $this->parseRoleByProject($key);
         if(!$roles){
             return [];
         }
         $rbac = [];
         foreach ($roles as $role){
-            foreach (json_decode(Role::where('project',$key)->where('role',$role)->actionPermissions,true) as $item){
+            foreach (json_decode(Role::where('project',$key)->where('role',$role)->first()->actionPermissions,true) as $item){
                 if(!in_array($item,$rbac)){
                     $rbac[] = $item ;
                 }
             }
         }
         return  $rbac;
+    }
+
+    /**
+     * 获取选着模型的的所有权限
+     * request()->user()->userAssets->userOwnerPermission()
+     * 获取当前用户的所有权限
+     */
+    public function userOwnerPermission(){
+        $project = $this->selectProject;
+        if($project){
+            return $this->getUserPermissionByProject($project);
+        }else{
+            return [];
+        }
     }
 
 

@@ -93,6 +93,7 @@ return [
             'name'=>'systemSet',
             'icon'=>'ios-cog-outline',
             'subMeun'=>[
+                // TODO 设计在这里是不合理的 这个子菜单的权限应该是独立出来的 , 新加一个子菜单，渠道授权
                 ['alias'=>'项目授权','addr'=>'/sys/userProject','interface' =>
                     [
                         [['post'],'/commitUserProject','commitUserProject'],  // 提交用户项目授权
@@ -114,12 +115,12 @@ return [
                         [['post'],'/modifyUserOwnerRoles','modifyUserOwnerRoles'],
                     ]
                 ],
-                ['alias'=>'用户设置','addr'=>'/sys/useSet','interface' =>
-                    [
-                        [['post'],'/userInfoList','userInfoList'],      // 返回用户的信息
-                        [['post','get'],'/changeInfo','changeInfo'],    // 提交用户的信息
-                    ]
-                ],
+//                ['alias'=>'用户设置','addr'=>'/sys/useSet','interface' =>
+//                    [
+//                        [['post'],'/userInfoList','userInfoList'],      // 返回用户的信息
+//                        [['post','get'],'/changeInfo','changeInfo'],    // 提交用户的信息
+//                    ]
+//                ],
                 ['alias'=>'日志翻译','addr'=>'/sys/render','interface' =>
                     [
                         [['post'],'/index','languageRender'],
@@ -142,7 +143,9 @@ return [
                 ['alias'=>'测试4','addr'=>'/test/four','interface' => []],
                 ['alias'=>'接口预览','addr'=>'/test/interface','interface' => []],
                 ['alias'=>'test5','addr'=>'/test/five','interface' => []],
-                ['alias'=>'six','addr'=>'/test/six','interface' => []],
+                ['alias'=>'six','addr'=>'/test/six','interface' => [
+                    [['post'],'/allPermission','allPermission'],
+                ]],
             ]
         ],
     ]

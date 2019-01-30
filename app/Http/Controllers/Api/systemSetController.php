@@ -170,7 +170,7 @@ class systemSetController extends Controller
     public function roledel(){
 
     }
-    public function modifyOtherPasswd(Request $request ){
+    public function modifyOtherPasswd(Request $request){
 
     }
 
@@ -179,7 +179,7 @@ class systemSetController extends Controller
      * @return mixed
      * TODO 检测输入是否合法
      */
-    public function modifyRolePermission(Request $request ){
+    public function modifyRolePermission(Request $request){
         $project = $request->user()->userAssets->selectProject;
         $role = $request->role;
         $newAcl = $request->newAcl;
@@ -201,7 +201,7 @@ class systemSetController extends Controller
 
     }
 
-    public function modifyUserOwnerRoles(Request $request ){
+    public function modifyUserOwnerRoles(Request $request){
         // TODO 检验输入是否合格
         $select = $request->select;
         $user = $request->user;

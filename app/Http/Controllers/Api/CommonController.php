@@ -26,7 +26,6 @@ class CommonController extends Controller {
         foreach ($projects as $project => $items){
             $result[] = ['projectName'=> $items['name'],'projectCode'=>$project];
         }
-//        return 'permissionIsNotDefined' ;
         return $result;
     }
 
@@ -36,21 +35,9 @@ class CommonController extends Controller {
         foreach ($projects as $project => $items){
             $result[$project] = $items['name'];
         }
-//        return 'permissionIsNotDefined' ;
         return $result;
     }
-    public function changeSelect(){
-        $select = request('select');
 
-        // 处理服务器逻辑 获取username
-
-        return 'success' ;
-        return 'permissionIsNotDefined' ;
-    }
-    public function test(Menu $menu){
-        dump($menu->listAllPanel());
-
-    }
 
     public function menu(Menu $menu){
         return  $menu->showMenu();
