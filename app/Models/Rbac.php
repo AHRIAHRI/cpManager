@@ -44,4 +44,68 @@ class Rbac
         return in_array($this->splitPath(),request()->user()->userAssets->userOwnerPermission());
     }
 
+    /**
+     * @param $permission
+     * @return bool
+     * 检查用户是否有单一的某个权限
+     */
+    public function checkUserSinglePermission($permission){
+        return in_array($permission,request()->user()->userAssets->userOwnerPermission());
+    }
+
+    /**
+     * @return bool
+     * 检测是否为配置的master用户
+     */
+    public function isMaster(){
+        $user = request()->user()->name;
+        if(!$user){
+            return false;
+        }
+        return in_array($user,$this->masters());
+    }
+
+    /**
+     * @return array
+     * 获取配置中所有的 master
+     */
+    public function masters(){
+        $masters = explode(',',env('MASTERS'));
+        if(empty($masters)){
+            return  [];
+        }
+        $checkMaster = [] ;
+        foreach ($masters as $item){
+            if($item && !in_array($item,$checkMaster)){
+                $checkMaster[] = $item;
+            }
+        }
+        return $checkMaster ;
+    }
+
+    // TODO 在添加一个新的项目的时候,自动为在项目项目下创建一个管理员角色,并且自动为master用户授权管理员角色
+    /*
+     * -----------------------------------------------------------------------------------------
+     | 遍历所有项目,如果项目没有如果admin角色,则创建一个角色并给出用户设置的权限
+     | 自动为master 分配在改项目下的admin权限
+     * -----------------------------------------------------------------------------------------
+     */
+    public function autoAuthorization(){
+        $userAssets = request()->user()->userAssets;
+
+        if(!$userAssets->selectProject){
+            return false ;
+        }
+        // TODO 暂时粗糙点,直接插入两条数据,
+        $role = new \App\Models\Role();
+        $role->role = 'masterAutoAdmin';
+        $role->project = $userAssets->selectProject;
+        $role->nickName = '自动管理员';
+        $role->actionPermissions = json_encode(['/sys/userManage']);
+        if($role->save()){
+           return $userAssets->updateRoleByProject($userAssets->selectProject,['masterAutoAdmin']);
+        }
+        return false ;
+    }
+
 }

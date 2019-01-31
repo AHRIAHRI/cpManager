@@ -42,7 +42,12 @@ class UserAssets extends Model
         }
         $rbac = [];
         foreach ($roles as $role){
-            foreach (json_decode(Role::where('project',$key)->where('role',$role)->first()->actionPermissions,true) as $item){
+            // 如果用户的角色模型没获取成功
+            $tempRoleModel = Role::where('project',$key)->where('role',$role)->first();
+            if(!$tempRoleModel){
+                continue;
+            }
+            foreach (json_decode($tempRoleModel->actionPermissions,true) as $item){
                 if(!in_array($item,$rbac)){
                     $rbac[] = $item ;
                 }

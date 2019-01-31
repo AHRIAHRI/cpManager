@@ -94,15 +94,15 @@ return [
             'icon'=>'ios-cog-outline',
             'subMeun'=>[
                 // TODO 设计在这里是不合理的 这个子菜单的权限应该是独立出来的 , 新加一个子菜单，渠道授权
-                ['alias'=>'项目授权','addr'=>'/sys/userProject','interface' =>
-                    [
-                        [['post'],'/commitUserProject','commitUserProject'],  // 提交用户项目授权
-                        [['post'],'/projectUserList','projectUserList'],      // 返回用户授权列表
-                        [['post'],'/platChannelList','platChannelList'],      // 返回授权项目中的平台和渠道，授权情况列表
-                        [['post'],'/commitChangePlat','commitChangePlat'],      // 提交授权项目中的平台和渠道
-
-                    ]
-                ],
+//                ['alias'=>'项目授权','addr'=>'/sys/userProject','interface' =>
+//                    [
+//                        [['post'],'/commitUserProject','commitUserProject'],  // 提交用户项目授权
+//                        [['post'],'/projectUserList','projectUserList'],      // 返回用户授权列表
+//                        [['post'],'/platChannelList','platChannelList'],      // 返回授权项目中的平台和渠道，授权情况列表
+//                        [['post'],'/commitChangePlat','commitChangePlat'],      // 提交授权项目中的平台和渠道
+//
+//                    ]
+//                ],
                 ['alias'=>'角色管理','addr'=>'/sys/userManage','interface' =>
                     [
                         [['post'],'/roleUserInfo','roleUserInfo'],
@@ -115,12 +115,12 @@ return [
                         [['post'],'/modifyUserOwnerRoles','modifyUserOwnerRoles'],
                     ]
                 ],
-//                ['alias'=>'用户设置','addr'=>'/sys/useSet','interface' =>
-//                    [
-//                        [['post'],'/userInfoList','userInfoList'],      // 返回用户的信息
-//                        [['post','get'],'/changeInfo','changeInfo'],    // 提交用户的信息
-//                    ]
-//                ],
+                ['alias'=>'渠道授权','addr'=>'/sys/plat','interface' =>
+                    [
+                        [['post'],'/allPlat','allPlat'],      // 返回渠道的授权列表
+                        [['post'],'/commitAuthorization','commitAuthorization'],    // 提交渠道的授权列表
+                    ]
+                ],
                 ['alias'=>'日志翻译','addr'=>'/sys/render','interface' =>
                     [
                         [['post'],'/index','languageRender'],

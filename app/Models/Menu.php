@@ -86,7 +86,14 @@ class Menu
         $finalPermission = request()->user()->userAssets->userOwnerPermission() ;
         // 用户如果没有权限，则返回空
         if(empty($finalPermission)){
-            return [];
+            // 如果master都没有权限自动授权,
+            $rbac = new Rbac();
+            if($rbac->isMaster()) {
+                $rbac->autoAuthorization();
+                $finalPermission = request()->user()->userAssets->userOwnerPermission() ;
+            }else{
+                return [];
+            }
         }
         foreach ($menu as $key => $item){
             $temp = [];

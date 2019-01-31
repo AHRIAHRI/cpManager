@@ -315,9 +315,11 @@ class systemSetController extends Controller
      * 因为你无法知道管理员是先分配角色还是项目
      * 如果没有,全部返回空
      */
-    public function projectUserList(CommonController $commonController){
+    public function masterInfo(CommonController $commonController ,Rbac $rbac){
+        if(!$rbac->isMaster()){
+            return  ['isMaster'=>false,'masterData'=>[]];
+        }
         $users = [] ;
-
         foreach(\App\Models\User::all() as $items ){
             $users[$items->name] = $items->userAssets->allProject ;
         };
@@ -346,7 +348,7 @@ class systemSetController extends Controller
             }
             $return[] = ['user' => $user, 'projects' => $finalTemp];
         }
-        return $return;
+        return ['isMaster'=>true,'masterData'=>$return];
 
     }
 
@@ -355,7 +357,13 @@ class systemSetController extends Controller
      * @return array
      * 提交用户授权的项目
      */
-    public function commitUserProject(Request $request){
+    public function commitUserProject(Request $request,Rbac $rbac){
+
+        // 如果不是master用户 拒绝处理 ，
+        if(!$rbac->isMaster()){
+            return  [ 'status' => false ];
+        }
+
         //对接受到数据做一个处理，是真假都要和原有的数据做一个对比
         $requesData = $request->data;
         $currentAssets = UserAssets::find($request->user);

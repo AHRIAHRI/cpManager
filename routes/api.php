@@ -30,6 +30,9 @@ Route::prefix('v1')
         Route::match(['post'], '/menu', 'Api\CommonController@menu');
         Route::match(['post'], '/sys/useSet/userInfoList', 'Api\systemSetController@userInfoList');
         Route::match(['post'], '/sys/useSet/changeInfo', 'Api\systemSetController@changeInfo');
+        // 限制master才能访问的接口
+        Route::match(['post'], '/sys/useSet/isMaster', 'Api\systemSetController@masterInfo');
+        Route::match(['post'], '/sys/userProject/commitUserProject', 'Api\systemSetController@commitUserProject');
         }
     );
 
