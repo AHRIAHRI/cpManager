@@ -48,6 +48,7 @@ class UserAssets extends Model
                 continue;
             }
             foreach (json_decode($tempRoleModel->actionPermissions,true) as $item){
+//            foreach ($tempRoleModel->actionPermissions as $item){
                 if(!in_array($item,$rbac)){
                     $rbac[] = $item ;
                 }

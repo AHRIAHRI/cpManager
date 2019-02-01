@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Common\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 
@@ -106,6 +107,24 @@ class Rbac
            return $userAssets->updateRoleByProject($userAssets->selectProject,['masterAutoAdmin']);
         }
         return false ;
+    }
+
+    /**
+     * @return mixed
+     * 选着一个项目
+     */
+    public function selectProject(){
+        $selectProject = request()->user()->userAssets->selectProject;
+        $conne = config('database.connections');
+        $dbs = array_keys($conne);
+        if(empty($selectProject) && !in_array($selectProject,$dbs)){
+            abort(403, '无效的或者不存在项目');
+        }
+        return trim($selectProject);
+    }
+
+    public function DB(){
+        return DB::connection($this->selectProject());
     }
 
 }
