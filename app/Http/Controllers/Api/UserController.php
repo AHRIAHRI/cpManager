@@ -17,7 +17,8 @@ class UserController extends Controller
         // return JWT for user in  Authorizathion ;
         // Get User select project
         $UserAssets = \App\Models\UserAssets::find(request()->name);
-        $allProject = $UserAssets->allProject;
+        $ownerProject = $UserAssets->allProject;
+        $allProjectInfo = json_decode($ownerProject, true);
         $selectProject = $UserAssets->selectProject;
 
         // user can't select project
@@ -28,9 +29,8 @@ class UserController extends Controller
            $select = $selectProject;
            $selectName = $allproject[$select];
         }else{
-            if ($allProject) {
+            if ($allProjectInfo) {
                 // user Can select Project but he not;
-                $allProjectInfo = json_decode($allProject, true);
                 $UserAssets->selectProject = $allProjectInfo[0]['projectCode'];
                 $UserAssets->save();
                 $select = $allProjectInfo[0]['projectCode'];

@@ -83,9 +83,12 @@ return [
             'name'=>'logDetail',
             'icon'=>'ios-list-box-outline',
             'subMeun'=>[
-                ['alias'=>'充值日志','addr'=>'/detail/form','interface' => []],
-                ['alias'=>'物品日志','addr'=>'/detail/countUp','interface' => []],
-                ['alias'=>'货币日志','addr'=>'/detail/registerPay','interface' => []],
+                ['alias'=>'充值日志','addr'=>'/detail/recharge','interface' => []],
+                ['alias'=>'物品日志','addr'=>'/detail/itemLogs','interface' => []],
+                ['alias'=>'货币日志','addr'=>'/detail/currencyLogs','interface' => []],
+                ['alias'=>'聊天日志','addr'=>'/detail/chatLogs','interface' => [
+                    [['post'],'/logs','chatLogs'],
+                ]],
             ]
         ],
         [
@@ -93,7 +96,7 @@ return [
             'name'=>'systemSet',
             'icon'=>'ios-cog-outline',
             'subMeun'=>[
-                // TODO 设计在这里是不合理的 这个子菜单的权限应该是独立出来的 , 新加一个子菜单，渠道授权
+                // TODO 需要在授权中检查addr是否存在？
 //                ['alias'=>'项目授权','addr'=>'/sys/userProject','interface' =>
 //                    [
 //                        [['post'],'/commitUserProject','commitUserProject'],  // 提交用户项目授权

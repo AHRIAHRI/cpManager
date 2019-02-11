@@ -26,9 +26,9 @@ class GameLogchat extends Model
      */
     public function clauseData($currentPage,$pageNum=20,$where=[]){
         $action = new Action();
-        list($data,$totlal) = $action->handlePageData($this,$currentPage,$pageNum,$where);
+        list($data,$total) = $action->handlePageData($this,$currentPage,$pageNum,$where);
 //        return compact('total','data');
-        return compact('data','totlal');
+        return compact('data','total');
     }
 
 }

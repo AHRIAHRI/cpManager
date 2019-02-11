@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Action
 {
+    // 每一类日志应该有该类自身的过滤机制，这里应该是加载通用的sql过滤规则 。
     private $where =  [['rawserverid','<>',0],['serverid','<>',0],['accountid',"<>",''],['channel',"<>",'']];
 
     /**
