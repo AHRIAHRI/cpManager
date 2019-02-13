@@ -148,6 +148,7 @@ return [
                 ['alias'=>'test5','addr'=>'/test/five','interface' => []],
                 ['alias'=>'six','addr'=>'/test/six','interface' => [
                     [['post'],'/allPermission','allPermission'],
+                    [['post'],'/test','test'],
                 ]],
             ]
         ],

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\UserAssets;
 use App\Models\GameLogchat;
+use App\Models\Action;
 
 class testdataController extends Controller
 {
@@ -21,5 +22,10 @@ class testdataController extends Controller
 
 //        $count  = GameLogchat::where('rolelevel',370)->count();
 //        dump($count);
+    }
+
+    public function test(GameLogchat $chat,Action $action){
+        dump( $action->getOptionInfo($chat));
+        return ['test'=>true];
     }
 }
