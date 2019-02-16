@@ -88,6 +88,7 @@ return [
                 ['alias'=>'货币日志','addr'=>'/detail/currencyLogs','interface' => []],
                 ['alias'=>'聊天日志','addr'=>'/detail/chatLogs','interface' => [
                     [['post'],'/logs','chatLogs'],
+                    [['post'],'/options','chatOptions'],
                 ]],
             ]
         ],

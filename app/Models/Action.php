@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Action
  * @package App\Models
  * 操作处理类 处理输入，过滤输入,平台和项目 过滤出来 到权限中判断 ，
+ * 这只是一个临时处理的方法，后续在完善和优化中应该使用契约对数据进行分析和管理统计实现数据的解耦
  */
 class Action
 {
@@ -48,7 +49,7 @@ class Action
      * 获取过滤条件的Optin选项
      */
     public function getOptionInfo(Model $model , $where = []){
-        // platAndChannel serverids rawserverids max min
+        // platAndChannel rawserverids max min
         $data = [
             'platAndChannel'=>[],
             'serverIDs' => [],
@@ -64,10 +65,13 @@ class Action
         }
 
         $result = $model->where($where)
+//            ->selectRaw('plat,channel,rawserverid,MAX(rolelevel) as max ,MIN(rolelevel) as min')
             ->selectRaw('plat,channel,serverid,rawserverid,MAX(rolelevel) as max ,MIN(rolelevel) as min')
             ->groupBy(['plat','channel','serverid','rawserverid'])
+//            ->groupBy(['plat','channel','rawserverid'])
             ->get();
         foreach ($result as $item){
+//            dump($item->toArray());
             if(!in_array($item->plat,array_keys($data['platAndChannel']))){
                 $data['platAndChannel'][$item->plat] = [];
                 $data['platAndChannel'][$item->plat][] = $item->channel;
@@ -76,12 +80,24 @@ class Action
                     $data['platAndChannel'][$item->plat][] = $item->channel;
                 }
             }
-            if(!in_array($item->serverid,$data['serverIDs'])){
-                $data['serverIDs'][] = $item->serverid ;
+            if(!in_array($item->plat,array_keys($data['serverIDs']))) {
+                $data['serverIDs'][$item->plat][] = $item->serverid;
+            }else{
+                if (!in_array($item->serverid, $data['serverIDs'][$item->plat])) {
+                    $data['serverIDs'][$item->plat][] = $item->serverid;
+                }
             }
-            if(!in_array($item->rawserverid,$data['rawServerIDs'])){
-                $data['rawServerIDs'][] = $item->rawserverid ;
+
+            if(!in_array($item->plat,array_keys($data['rawServerIDs']))) {
+                $data['rawServerIDs'][$item->plat][] = $item->rawserverid;
+            }else{
+                if (!in_array($item->rawserverid, $data['rawServerIDs'][$item->plat])) {
+                    $data['rawServerIDs'][$item->plat][] = $item->rawserverid;
+                }
             }
+//            if(!in_array($item->rawserverid,$data['rawServerIDs'][$item->plat])){
+//                $data['rawServerIDs'][$item->plat] = $item->rawserverid ;
+//            }
             if($data['lvMin'] >= $item->min){
                 $data['lvMin'] = $item->min;
             }

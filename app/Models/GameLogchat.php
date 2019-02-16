@@ -24,11 +24,12 @@ class GameLogchat extends Model
      * @return array
      * 返回分页的数据和数据的总数
      */
-    public function clauseData($currentPage,$pageNum=20,$where=[]){
-        $action = new Action();
-        list($data,$total) = $action->handlePageData($this,$currentPage,$pageNum,$where);
-//        return compact('total','data');
-        return compact('data','total');
-    }
+//    public function clauseData($currentPage,$pageNum=20,$where=[]){
+//        $action = new Action();
+//        list($data,$total) = $action->handlePageData($this,$currentPage,$pageNum,$where);
+//        return compact('data','total');
+//    }
+
+
 
 }
