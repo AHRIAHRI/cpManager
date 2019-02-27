@@ -43,10 +43,10 @@ return [
         'yhsy' => [
             'driver' => 'mysql',
             'host' => env('YHSY_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
+            'port' =>  env('YHSY_PROT', '3306'),
             'database' => env('YHSY_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'username' => env('YHSY_USER', 'forge'),
+            'password' => env('YHSY_PASSWD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -58,7 +58,7 @@ return [
         'sjxx' => [
             'driver' => 'mysql',
             'host' => env('SJXX_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
+            'port' => env('YHSY_PROT', '3306'),
             'database' => env('SJXX_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
@@ -73,7 +73,7 @@ return [
         'sjjy' => [
             'driver' => 'mysql',
             'host' => env('SJJY_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
+            'port' => env('YHSY_PROT', '3306'),
             'database' => env('SJJY_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
