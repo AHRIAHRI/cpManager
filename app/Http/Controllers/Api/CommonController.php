@@ -43,5 +43,8 @@ class CommonController extends Controller {
         return  $menu->showMenu();
     }
 
+    public function test(){
+        return ['liaoxixaotao' => 'adfasddfad' ];
+    }
 
 }

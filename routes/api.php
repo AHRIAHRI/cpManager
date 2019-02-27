@@ -43,7 +43,7 @@ Route::prefix('v1')
         $util = new Menu();
         $util -> registerRoute();
     });
-//Route::get('/test','Api\CommonController@test');
+Route::get('/test','Api\CommonController@test');
 
 
 
