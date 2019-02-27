@@ -24,7 +24,7 @@ class CrossDomain
 //        header('Access-Control-Allow-Methods:OPTIONS POST GET ');
 //        header('Access-Control-Allow-Headers:authorization,content-type');
         $response = $next($request);
-        $response->header('Access-Control-Allow-Origin', 'https://data.fengbaogame.cn/');
+        $response->header('Access-Control-Allow-Origin', 'https://data.fengbaogame.cn');
         $response->header('Access-Control-Allow-Methods', '*');
         $response->header('Access-Control-Expose-Headers', 'Authorization');
         $response->header('Access-Control-Allow-Headers', 'Authorization,content-type');
