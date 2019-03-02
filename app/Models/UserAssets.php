@@ -29,6 +29,43 @@ class UserAssets extends Model
     }
 
     /**
+     * @param $key
+     * @param $data
+     * @return bool
+     * 更新用户的平台权限
+     */
+    public function updateUserPlatChannelPermission($data){
+        $selectProject = app('general')->selectProject();
+        $platPermission = json_decode($this->allProject,true);
+        $newPlatPermission = [];
+        foreach ($platPermission as $items){
+            if($selectProject == $items['projectCode']){
+                $items['plat'] = $data;
+            }
+            $newPlatPermission [] = $items;
+        }
+        $this->allProject = json_encode($newPlatPermission) ;
+        return $this->save();
+    }
+
+    /**
+     * @return mixed
+     * 返回用户的渠道和平台权限
+     */
+    public function userPlatChannelPermission(){
+        $selectProject = app('general')->selectProject();
+        $platPermission = json_decode($this->allProject,true);
+        foreach ($platPermission as $items){
+            if($selectProject == $items['projectCode']){
+                $temp = $items ;
+                break ;
+            }
+        }
+        return empty($temp['plat']) ? [] : $temp['plat'] ;
+    }
+
+
+    /**
      * @param $project
      * @return array
      * 并集多个角色项目下的最终权限
@@ -94,6 +131,7 @@ class UserAssets extends Model
         return $this->save();
     }
 
+
     /**
      * @return array
      * 以kv的形式解析出用户所有的项目权限，没有则为空
@@ -133,6 +171,7 @@ class UserAssets extends Model
      */
     public function upateAllProjectRbac($key,$rbac){
         // 因为是修改权限所以必须存在这个属项目
+
        $data =  json_decode($this->allProject,true);
        if(empty($this->allProject) || empty($data[$key])){
            return false;

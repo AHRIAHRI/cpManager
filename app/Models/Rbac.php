@@ -114,7 +114,7 @@ class Rbac
      * 选着一个项目
      */
     public function selectProject(){
-        $selectProject = request()->user()->userAssets->selectProject;
+        $selectProject = app('general')->selectProject();
         $conne = config('database.connections');
         $dbs = array_keys($conne);
         if(empty($selectProject) && !in_array($selectProject,$dbs)){

@@ -108,6 +108,25 @@ class Action
         return $data;
     }
 
+    /**
+     * @return mixed
+     * 从登录日志中获取所有的平台和渠道
+     */
+    public function allPlatAndChannel(){
+        $loginLog = new GameLogin();
+        $result = $loginLog->where($this->where)
+            ->select('plat','channel')
+            ->orderBy('generatetime', 'desc')
+            ->groupBy(['plat','channel'])
+            ->get();
+        $temp = [] ;
+        foreach ($result as $item){
+           $temp[$item->plat][]= $item->channel;
+        }
+        krsort($temp);
+
+        return $temp;
+    }
 
 
 
