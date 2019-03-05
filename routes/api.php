@@ -24,20 +24,27 @@ Route::prefix('v1')
     ->group(function (){
         Route::post('/login', 'Api\UserController@login');
     });
+
+/**
+ * 手动配置路由
+ */
 Route::prefix('v1')
     ->middleware('jwt.auth')
     ->group(function () {
         Route::match(['post'], '/menu', 'Api\CommonController@menu');
         Route::match(['post'], '/sys/useSet/userInfoList', 'Api\systemSetController@userInfoList');
         Route::match(['post'], '/sys/useSet/changeInfo', 'Api\systemSetController@changeInfo');
-        // 限制master才能访问的接口
+        // TODO 限制master才能访问的接口
         Route::match(['post'], '/sys/useSet/isMaster', 'Api\systemSetController@masterInfo');
         Route::match(['post'], '/sys/userProject/commitUserProject', 'Api\systemSetController@commitUserProject');
         }
     );
 
+/**
+ * 根据配置文件自动加载路由
+ */
 Route::prefix('v1')
-    ->middleware(['jwt.auth','CheckPermission'])
+    ->middleware(['jwt.auth','CheckPermission','CheckPlatChannelPermission'])
     ->group(function () {
         // 注册所有的菜单路由
         $util = new Menu();

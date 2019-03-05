@@ -54,6 +54,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
 //        'cross' => \App\Http\Middleware\CrossDomain::class,
         'CheckPermission' => \App\Http\Middleware\CheckActionPermission::class,
+        'CheckPlatChannelPermission' => \App\Http\Middleware\CheckPlatChannelPermission::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,

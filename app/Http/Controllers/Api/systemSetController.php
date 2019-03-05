@@ -420,35 +420,39 @@ class systemSetController extends Controller
      * ]
      */
     public function allPlat(){
-
         // 获取所有的平台和渠道
         $action = new Action();
         $platChannels = $action->allPlatAndChannel();
 
         // 组装成前端约定的权限格式
-        $permissionFormate = [ 'all'=>false, 'plats'=>[],];
+        $permissionFormate_1 = [ 'all'=>false, 'plats'=>[],];
         foreach ($platChannels as $plat => $channels){
             $tempChannels = [];
             foreach ($channels as $channel){
                 $tempChannels[] = ['channel' => $channel,'allow' => false];
             }
-            $permissionFormate['plats'][] = ['platName' => $plat ,'allow' => false, 'channels' => $tempChannels];
+            $permissionFormate_1['plats'][] = ['platName' => $plat ,'allow' => false, 'channels' => $tempChannels];
         }
 
         // 最终的格式
         $userAssetsModels = app('general')->ownerProjectUsers();
         $userPlatChanenlInfos = [] ;
         foreach ($userAssetsModels as $assets){
+
+            // 下一个用户需要重置所有选项，否则在上一个用户的信息中遍历，产生异常的结果
+            $permissionFormate = $permissionFormate_1;
+
             $userPlatChanenlInfo['user'] = $assets->user;
             $userOwnerPermission = $assets->userPlatChannelPermission();
+
             if('all' == $userOwnerPermission){
-                // 拥有所有的项目权限
+                // 拥有所有的项目权限的情况
                 $permissionFormate['all'] = true ;
                 $userPlatChanenlInfo['platChannel'] =  $permissionFormate;
             }else{
 
                 if($userOwnerPermission){
-                    // 拥有一部分权限
+                    // 拥有一部分权限的情况
                     foreach ($userOwnerPermission as $key1 => $values1){
                         if('all' == $values1){
                             foreach ($permissionFormate['plats'] as $key2 => $values2){
@@ -471,11 +475,9 @@ class systemSetController extends Controller
                             }
                         }
                     }
-
-                }else{
-                    // 没有任何权限
-                    $userPlatChanenlInfo['platChannel'] =  $permissionFormate;
                 }
+                // 没有任何权限的情况
+                $userPlatChanenlInfo['platChannel'] =  $permissionFormate;
             }
             $userPlatChanenlInfos [] = $userPlatChanenlInfo ;
         }
@@ -492,11 +494,11 @@ class systemSetController extends Controller
             // 拥有全部权限，不再继续判断
             $return = 'all';
         }else{
-            //继续判断平台权限
+            // 继续判断平台权限
             $return = [];
             foreach ($data['plats'] as $key => $plats){
                 if($plats['allow']){
-                    //拥有全部平台的权限
+                    // 拥有全部平台的权限
                     $return[$plats['platName']] = 'all';
                 }else{
                     // 继续判断渠道权限
@@ -508,13 +510,17 @@ class systemSetController extends Controller
                 }
             }
         }
-
-        dump(['$user'=> $user ,'$return'=>$return]);
-        // 从data 中解析出数据库存放的数据格式
-
-        return ['status'=>true];
-
+        return ['status' => UserAssets::find($user)->updateUserPlatChannelPermission($return) ];
     }
 
 
 }
+
+
+
+
+
+
+
+
+

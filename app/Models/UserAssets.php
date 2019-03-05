@@ -40,7 +40,7 @@ class UserAssets extends Model
         $newPlatPermission = [];
         foreach ($platPermission as $items){
             if($selectProject == $items['projectCode']){
-                $items['plat'] = $data;
+                $items['plats'] = $data;
             }
             $newPlatPermission [] = $items;
         }
@@ -61,7 +61,7 @@ class UserAssets extends Model
                 break ;
             }
         }
-        return empty($temp['plat']) ? [] : $temp['plat'] ;
+        return empty($temp['plats']) ? [] : $temp['plats'] ;
     }
 
 
