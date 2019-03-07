@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class UserAssets
+ * @package App\Models
+ * 哥们，如果你看权限控制，我建议你放弃吧，自己重写一个可能比我写的好。
+ */
 class UserAssets extends Model
 {
     //
@@ -65,6 +70,7 @@ class UserAssets extends Model
     }
 
 
+
     /**
      * @param $project
      * @return array
@@ -85,7 +91,6 @@ class UserAssets extends Model
                 continue;
             }
             foreach (json_decode($tempRoleModel->actionPermissions,true) as $item){
-//            foreach ($tempRoleModel->actionPermissions as $item){
                 if(!in_array($item,$rbac)){
                     $rbac[] = $item ;
                 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Scopes\ExcludeEmpty;
 use Illuminate\Database\Eloquent\Model;
 
 class GameLogin extends Model
@@ -16,6 +17,17 @@ class GameLogin extends Model
         $rbac = new Rbac();
         $this->connection = $rbac->selectProject();
     }
+    /**
+     * 模型加载全局过滤
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new ExcludeEmpty);
+    }
+
+
 
 
 }

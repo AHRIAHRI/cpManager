@@ -44,7 +44,8 @@ class CommonController extends Controller {
     }
 
     public function test(){
-        return ['liaoxixaotao' => 'adfasddfad' ];
+//        dump(app('general')->dayAgo(7));
+        return app('general')->formatDayTime('2019-12-12');
     }
 
 }

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
  * Class Rbac
  * @package App\Models
  * 权限控制模型
+ * 哥们，如果你看权限控制，我建议你放弃吧，自己重写一个可能比我写的好。
  */
 class Rbac
 {
@@ -130,7 +131,7 @@ class Rbac
     /**
      *
      * -----------------------------------------------------------------------------------------
-     | 检查权限 我们约定 平台统一用key [plat] 渠道统一用key [channel]
+     | 检查权限 我们约定 平台统一用key [plat] 渠道统一用key [channel],这个参数位于参数对象filter中
      | 约定格式为 [['plats'=>'ms1','channel'=> ['1001','213123']]，['plats'=>'ms1','channel'=> []]]
      | 前端传过来的格式  { "plat": [ "ms1", "s00", "qp1" ], "channel": [ "ms1/123", "s00/102", "s00/104" ]}
      | 如果渠道为空约定为全部渠道，否则权限继续判断
@@ -139,24 +140,24 @@ class Rbac
      */
     public function checkPlatChannelPermission(){
         $input = request()->all();
-        // 如果用户没传这两个key，则放行，我们约定查询数据必须携带这两个key
-        if(! (array_key_exists('plat',$input) && array_key_exists('channel',$input))){
+        // 我们约定查询数据必须携带filter
+        if(! array_key_exists('filter',$input) ){
             return  ['check' => true] ;
         }else{
-            $plats = $input['plat'];
-            $channels = $input['channel'];
+            $plats = $input['filter']['plat'];
+            $channels = $input['filter']['channel'];
         }
         // 临时保存没有权限的渠道，
         $notPermission = [] ;
         $userCurrentPermission = request()->user()->userAssets->userPlatChannelPermission();
-//        dump($userCurrentPermission);
+
         // 用户当前的权限
         if( 'all' == $userCurrentPermission ){
             // 用户拥有所有的渠道权限直接返回all
             return ['check' => true ];
         }
         if(empty($userCurrentPermission)){
-            return ['check' => false, 'mesg'=>'没有任何权限' ];
+            return ['check' => false, 'mesg'=>'youHaveNullPermission' ];
         }
         // 用户是只是拥有单全都权限 获取它的值
         $usuerChannelPermission = [];
@@ -168,8 +169,8 @@ class Rbac
             }
         }
         // 用户没有选择代表全部平台
-        if( empty($plats) && 'all' != $userCurrentPermission ){
-            return ['check' => false, 'mesg'=>'权限不够' ];
+        if( empty($plats)  ){
+            return ['check' => true, 'mesg'=>'permissionIsNotDefine' ];
         }
         // 解析前端传过来的格式
         // 用户选择中 $all为全部渠道的平台, $parseChannel大数组对应平台和渠道
@@ -197,10 +198,12 @@ class Rbac
                 }
             }
         }
+//        echo "-------------------";
+//        dump($notPermission);
         if(empty($notPermission)){
             return ['check' => true ];
         }else{
-            return ['check' => false , 'mesg'=> implode(',',$notPermission).';权限不够'];
+            return ['check' => false , 'mesg'=> implode(',',$notPermission)];
         }
     }
 

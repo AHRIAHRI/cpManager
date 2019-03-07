@@ -8,7 +8,7 @@
 namespace App\Http\Service;
 
 
-
+use Carbon\Carbon;
 class General
 {
     /**
@@ -18,6 +18,21 @@ class General
     public function selectProject(){
         return request()->user()->userAssets->selectProject;
     }
+
+    /**
+     * @param $data
+     * @return Carbon
+     * 获取7天气零点的时间
+     */
+    public function dayAgo($data){
+        return  Carbon::tomorrow()->subDays($data)->toDateTimeString();
+    }
+
+    public function formatDayTime($data1){
+        $date = new Carbon($data1);
+        return [$data1.' 00:00:00' ,$date->addDays(1)->toDateTimeString()];
+    }
+
 
     /**
      * @return object

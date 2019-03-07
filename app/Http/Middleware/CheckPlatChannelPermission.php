@@ -18,10 +18,11 @@ class CheckPlatChannelPermission
     {
         $rbac = new Rbac();
         $result = $rbac->checkPlatChannelPermission();
+//        dump($result);
         if($result['check']) {
             return $next($request);
         }else{
-            return response('platChannelPremissionIsUndefine',401);
+            return response($result['mesg'],401);
         }
     }
 }
