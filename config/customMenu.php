@@ -83,9 +83,71 @@ return [
             'name'=>'logDetail',
             'icon'=>'ios-list-box-outline',
             'subMeun'=>[
-                ['alias'=>'充值日志','addr'=>'/detail/recharge','interface' => []],
-                ['alias'=>'物品日志','addr'=>'/detail/itemLogs','interface' => []],
-                ['alias'=>'货币日志','addr'=>'/detail/currencyLogs','interface' => []],
+                ['alias'=>'充值日志','addr'=>'/detail/recharge','interface' => [
+                    [['post'],'/logs','rechargeLogs'],
+                    [['post'],'/options','rechargeLogsOptions'],
+                ]],
+
+                ['alias'=>'登录日志','addr'=>'/detail/login','interface' => [
+                    [['post'],'/logs','loginLogs'],
+                    [['post'],'/options','loginLogsOptions'],
+                ]],
+
+                ['alias'=>'会话日志','addr'=>'/detail/session','interface' => [
+                    [['post'],'/logs','sessionLogs'],
+                    [['post'],'/options','sessionLogsOptions'],
+                ]],
+
+                ['alias'=>'商城日志','addr'=>'/detail/shop','interface' => [
+                    [['post'],'/logs','shopLogs'],
+                    [['post'],'/options','shopLogsOptions'],
+                ]],
+
+                ['alias'=>'邮件日志','addr'=>'/detail/mail','interface' => [
+                    [['post'],'/logs','mailLogs'],
+                    [['post'],'/options','mailLogsOptions'],
+                ]],
+
+                ['alias'=>'升级日志','addr'=>'/detail/levelup','interface' => [
+                    [['post'],'/logs','levelupLogs'],
+                    [['post'],'/options','levelupLogsOptions'],
+                ]],
+
+                ['alias'=>'排行榜日志','addr'=>'/detail/rank','interface' => [
+                    [['post'],'/logs','rankLogs'],
+                    [['post'],'/options','rankLogsOptions'],
+                ]],
+
+                ['alias'=>'任务日志','addr'=>'/detail/task','interface' => [
+                    [['post'],'/logs','taskLogs'],
+                    [['post'],'/options','taskLogsOptions'],
+                ]],
+
+                ['alias'=>'掉落日志','addr'=>'/detail/drop','interface' => [
+                    [['post'],'/logs','dropLogs'],
+                    [['post'],'/options','dropLogsOptions'],
+                ]],
+
+                ['alias'=>'在线日志','addr'=>'/detail/online','interface' => [
+                    [['post'],'/logs','onlineLogs'],
+                    [['post'],'/options','onlineLogsOptions'],
+                ]],
+
+                ['alias'=>'物品日志','addr'=>'/detail/virtualitems','interface' => [
+                    [['post'],'/logs','virtualitemsLogs'],
+                    [['post'],'/options','virtualitemsLogsOptions'],
+                ]],
+
+//                ['alias'=>'物品日志','addr'=>'/detail/item','interface' => [
+//                    [['post'],'/logs','itemLogs'],
+//                    [['post'],'/options','itemLogsOptions'],
+//                ]],
+
+                ['alias'=>'货币日志','addr'=>'/detail/currencyLogs','interface' => [
+                    [['post'],'/logs','currencyLogs'],
+                    [['post'],'/options','currencyLogsOptions'],
+                ]],
+
                 ['alias'=>'聊天日志','addr'=>'/detail/chatLogs','interface' => [
                     [['post'],'/logs','chatLogs'],
                     [['post'],'/options','chatOptions'],

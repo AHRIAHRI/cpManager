@@ -24,9 +24,9 @@ class Action
      */
     public function handlePageData(Model $model,$currentPage,$pageNum = 20){
 
-        $where = $this->fromUserInputGetSQLwhereTerms();
+        $where = app('filter')->whereTerms();
 
-        $newModel  = empty($where) ? $model : $model->whereRaw($where);
+        $newModel  = $model->whereRaw($where);
 
         // $newModel要先统计否则会多重return 导致一个错误的结果
         $total = $newModel->count();
@@ -35,6 +35,8 @@ class Action
             ->offset($pageNum * ($currentPage - 1))
             ->limit($pageNum)
             ->get();
+//            ->toSql();
+//        dump($result);exit();
         $data = [];
         foreach ($result as $items){
             $data[] = $items->toArray();
@@ -59,9 +61,9 @@ class Action
             'lvMin' => 1000000000000000000000000000000,
 
         ];
-        $where = $this->userMaxSQLwhereTerms();
+        $where = app('filter')->userMaxSQLwhereTerms();
 //        $where = [];
-        $newModel  = empty($where) ? $model : $model->whereRaw($where);
+        $newModel  =  $model->whereRaw($where);
         $result = $newModel
             ->selectRaw('plat,channel,serverid,rawserverid,MAX(rolelevel) as max ,MIN(rolelevel) as min')
             ->groupBy(['plat','channel','serverid','rawserverid'])
@@ -119,91 +121,6 @@ class Action
         }
         krsort($temp);
         return $temp;
-    }
-
-    /**
-     * @return string
-     * 根据用户的最大权限组装sql获取查询选择的where
-     */
-    public function userMaxSQLwhereTerms(){
-
-        // 这里不可能为空,如果为空，中间件验证都没通过
-        $maxPermission = request()->user()->userAssets->userPlatChannelPermission();
-        if( 'all' == $maxPermission ){
-            return '1 = 1';
-        };
-
-        $return = [];
-        // {"s00":["107","1008","106","s00","10086"],"qp1":"all"} 这个格式的数据进行组装成新的 where
-        foreach ($maxPermission as $tempPlat => $tempChannel){
-            if( 'all' == $tempChannel){
-                $return[] = ' plat = "'. $tempPlat.'"';
-            }else{
-                $return[] = '(plat = "'. $tempPlat. '" and channel in ( "'.implode( '","',$tempChannel).'" ))';
-            }
-        }
-
-        return implode(' or ',$return) ;
-    }
-
-    /**
-     * @return string
-     * 返回用户选择的where
-     * 如果用户没有选择就返回用户的最大选择（时间限制为7天）
-     */
-    public function fromUserInputGetSQLwhereTerms(){
-
-        $input = request()->all();
-        // 我们约定查询数据必须携带filter
-        if(! array_key_exists('filter',$input) ){
-            return  '' ;
-        }else{
-            $filter = $input['filter'];
-        }
-        $plat = $filter['plat'] ?? '';
-        $channel = $filter['channel'] ?? '';
-        $gameServerID = $filter['gameServerID'] ?? '';
-        $rawGameServerID = $filter['rawGameServerID'] ?? '';
-        $roleName = $filter['roleName'] ?? '';
-        $rangeTime = $filter['rangeTime'] ?? '2019-03-07,2019-03-04';
-        $roleID = $filter['roleID'] ?? '';
-        $userAccount = $filter['userAccount'] ?? '';
-        $openLevel = $filter['openLevel'] ?? '';
-        $rangeLevel = $filter['rangeLevel'] ?? '';
-
-
-        // 时间是and操作
-        if(is_array($rangeTime)){
-            // 为时间区间选择
-            $startTime = $rangeTime[0];
-            $endTime = $rangeTime[1];
-            $timeWhere = 'generatetime >= "'.$startTime .'" and generatetime < "'.$endTime.'"';
-
-        }elseif( $rangeTime && is_string($rangeTime)){
-            // 为多天时间选择
-            $arrayWhere = [];
-            foreach (explode(',',$rangeTime) as $tempDayTime){
-                list($startTime,$endTime) = app('general')->formatDayTime($tempDayTime);
-                $arrayWhere [] = '(generatetime >= "'.$startTime .'" and generatetime < "'.$endTime.'")' ;
-            }
-            $timeWhere =  '('.implode(' or ',$arrayWhere).')' ;
-        }elseif (empty($rangeTime)){
-            // 时间没有选择
-            $startTime = app('general')->dayAgo(7);
-            $timeWhere = 'generatetime >= "'.$startTime .'"' ;
-        }
-
-        // 没有选择任何一个项目，那么返回最大的权限 ,加上时间的过滤，不然数据量太大(7天)
-//        if($plat || $channel ||  $gameServerID || $rawGameServerID || $roleName || $rangeTime || $roleID || $userAccount || $openLevel ){
-            $where = $this->userMaxSQLwhereTerms() ;
-            return '('.$where.') and '.$timeWhere;
-//        }
-//        if(empty())
-
-        // 一个个条件做判断
-
-
-
     }
 
 

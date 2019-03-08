@@ -177,11 +177,15 @@ class Rbac
         $parseChannel = [] ;
         if(!empty($channels)) {
             foreach ($channels as $channel) {
+                $info = explode('/',$channel);
+                $parseChannel[$info[0]][] = $info[1];
+                if( isset($userCurrentPermission[$info[0]]) && 'all' == $userCurrentPermission[$info[0]]){
+                    continue;
+                }
                 if(!in_array($channel,$usuerChannelPermission)){
                     $notPermission[] = $channel;
                 }
-                $info = explode('/',$channel);
-                $parseChannel[$info[0]][] = $info[1];
+
             }
         }
         $all = [];

@@ -27,6 +27,9 @@ class GameServiceProvider extends ServiceProvider
         $this->app->singleton('general',function(){
             return new \App\Http\Service\General();
         });
+        $this->app->singleton('filter',function(){
+            return new \App\Http\Service\PlatPermission();
+        });
 
     }
 }
