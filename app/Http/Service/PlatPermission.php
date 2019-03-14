@@ -9,6 +9,7 @@
 namespace App\Http\Service;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class PlatPermission
@@ -212,6 +213,92 @@ class PlatPermission
         }
         return  '';
     }
+
+    /**
+     * @param Model $model
+     * @param $currentPage
+     * @param int $pageNum
+     * @return array
+     * 返回用户的分页数据和总数(通用的)
+     */
+    public function handlePageData(Model $model,$currentPage,$pageNum = 20){
+
+        $where = $this->whereTerms();
+        $newModel  = $model->whereRaw($where);
+        // $newModel要先统计否则会多重return 导致一个错误的结果
+        $total = $newModel->count();
+        $result = $newModel
+            ->orderBy('generatetime', 'desc')
+            ->offset($pageNum * ($currentPage - 1))
+            ->limit($pageNum)
+            ->get();
+//            ->toSql();
+//        dump($result);exit();
+        $data = [];
+        foreach ($result as $items){
+            $data[] = $items->toArray();
+        }
+        return [$data,$total] ;
+    }
+
+    /**
+     * @param Model $model
+     * @return array
+     * 获取日志中的选项 (通用的)
+     */
+    public function getOptionInfo(Model $model){
+        // platAndChannel rawserverids max min
+        // TODO 应该懂redis中加载
+        $data = [
+            'platAndChannel'=>[],
+            'serverIDs' => [],
+            'rawServerIDs' => [],
+            'lvMax' => 0,
+            'lvMin' => 1000000000000000000000000000000,
+
+        ];
+        $where = $this->userMaxSQLwhereTerms();
+//        $where = [];
+        $newModel  =  $model->whereRaw($where);
+        $result = $newModel
+            ->selectRaw('plat,channel,serverid,rawserverid,MAX(rolelevel) as max ,MIN(rolelevel) as min')
+            ->groupBy(['plat','channel','serverid','rawserverid'])
+            ->get();
+        foreach ($result as $item){
+            if(!in_array($item->plat,array_keys($data['platAndChannel']))){
+                $data['platAndChannel'][$item->plat] = [];
+                $data['platAndChannel'][$item->plat][] = $item->channel;
+            }else{
+                if(!in_array($item->channel,$data['platAndChannel'][$item->plat])){
+                    $data['platAndChannel'][$item->plat][] = $item->channel;
+                }
+            }
+            if(!in_array($item->plat,array_keys($data['serverIDs']))) {
+                $data['serverIDs'][$item->plat][] = $item->serverid;
+            }else{
+                if (!in_array($item->serverid, $data['serverIDs'][$item->plat])) {
+                    $data['serverIDs'][$item->plat][] = $item->serverid;
+                }
+            }
+
+            if(!in_array($item->plat,array_keys($data['rawServerIDs']))) {
+                $data['rawServerIDs'][$item->plat][] = $item->rawserverid;
+            }else{
+                if (!in_array($item->rawserverid, $data['rawServerIDs'][$item->plat])) {
+                    $data['rawServerIDs'][$item->plat][] = $item->rawserverid;
+                }
+            }
+            if($data['lvMin'] >= $item->min){
+                $data['lvMin'] = $item->min;
+            }
+            if($data['lvMax'] <= $item->max){
+                $data['lvMax'] = $item->max;
+            }
+        }
+        return $data;
+    }
+
+
 
 
 }

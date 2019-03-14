@@ -123,7 +123,6 @@ class Rbac
         return trim($selectProject);
     }
 
-
     public function DB(){
         return DB::connection($this->selectProject());
     }
@@ -185,7 +184,6 @@ class Rbac
                 if(!in_array($channel,$usuerChannelPermission)){
                     $notPermission[] = $channel;
                 }
-
             }
         }
         $all = [];
@@ -202,8 +200,6 @@ class Rbac
                 }
             }
         }
-//        echo "-------------------";
-//        dump($notPermission);
         if(empty($notPermission)){
             return ['check' => true ];
         }else{
@@ -211,13 +207,6 @@ class Rbac
         }
     }
 
-    /**
-     * 根据用户的最大渠道平台权限,返回用户可以选择的全都和平台选项
-     * (当选项为all的时候，返回具体的选择)
-     */
-    public function userDefaultPlatChannel(){
-
-    }
 }
 
 

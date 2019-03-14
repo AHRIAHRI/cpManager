@@ -17,7 +17,6 @@ use App\Models\GameLogSession;
 use App\Models\GameLogShop;
 use App\Models\GameLogTask;
 use App\Models\GameLogVirtualitem;
-use App\Models\Action;
 
 class logDetailController extends Controller
 {
@@ -30,22 +29,20 @@ class logDetailController extends Controller
     /**
      * @param Request $request
      * @param GameLogchat $chat
-     * @param Action $action
      * @return array
      */
-    public function chatLogs(Request $request, GameLogchat $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function chatLogs(Request $request, GameLogchat $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
     }
 
     /**
      * @param GameLogchat $chat
-     * @param Action $action
      * @return array
      * 返回聊天日志的分类选项
      */
-    public function chatOptions(GameLogchat $Model, Action $action){
-        return  $action->getOptionInfo($Model);
+    public function chatOptions(GameLogchat $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
 
@@ -55,10 +52,14 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function rechargeLogs(Request $request, GameLogPay $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function rechargeLogs(Request $request, GameLogPay $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
     }
+    public function rechargeLogsOptions(GameLogPay $Model){
+        return  app('filter')->getOptionInfo($Model);
+    }
+
 
     /**
      *------------------------------------------------------------------------------------------------------
@@ -66,9 +67,12 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function loginLogs(Request $request, GameLogin $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function loginLogs(Request $request, GameLogin $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
+    }
+    public function loginLogsOptions(GameLogin $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
     /**
@@ -77,10 +81,15 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function sessionLogs(Request $request, GameLogSession $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function sessionLogs(Request $request, GameLogSession $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
     }
+
+    public function sessionLogsOptions(GameLogSession $Model){
+        return  app('filter')->getOptionInfo($Model);
+    }
+
 
     /**
      *------------------------------------------------------------------------------------------------------
@@ -88,9 +97,13 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function shopLogs(Request $request, GameLogShop $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function shopLogs(Request $request, GameLogShop $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
+    }
+
+    public function shopLogsOptions(GameLogShop $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
     /**
@@ -99,9 +112,13 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function mailLogs(Request $request, GameLogMail $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function mailLogs(Request $request, GameLogMail $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
+    }
+
+    public function mailLogsOptions(GameLogMail $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
     /**
@@ -110,9 +127,13 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function levelupLogs(Request $request, GameLogLevelup $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function levelupLogs(Request $request, GameLogLevelup $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
+    }
+
+    public function levelupLogsOptions(GameLogLevelup $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
     /**
@@ -121,10 +142,15 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function rankLogs(Request $request, GameLogRank $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function rankLogs(Request $request, GameLogRank $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
     }
+
+    public function rankLogsOptions(GameLogRank $Model){
+        return  app('filter')->getOptionInfo($Model);
+    }
+
 
     /**
      *------------------------------------------------------------------------------------------------------
@@ -132,9 +158,13 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function taskLogs(Request $request, GameLogTask $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function taskLogs(Request $request, GameLogTask $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
+    }
+
+    public function taskLogsOptions(GameLogTask $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
     /**
@@ -143,31 +173,40 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function dropLogs(Request $request, GameLogItemDrop $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function dropLogs(Request $request, GameLogItemDrop $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
     }
 
+    public function dropLogsOptions(GameLogItemDrop $Model){
+        return  app('filter')->getOptionInfo($Model);
+    }
     /**
      *------------------------------------------------------------------------------------------------------
      * 在线日志
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function onlineLogs(Request $request, GameLogOnline $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function onlineLogs(Request $request, GameLogOnline $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
     }
-
+    public function onlineLogsOptions(GameLogOnline $Model){
+        return  app('filter')->getOptionInfo($Model);
+    }
     /**
      *------------------------------------------------------------------------------------------------------
      * 物品日志
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function virtualitemsLogs(Request $request, GameLogVirtualitem $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function virtualitemsLogs(Request $request, GameLogVirtualitem $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
+    }
+
+    public function virtualitemsLogsOptions(GameLogVirtualitem $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
 
@@ -177,9 +216,13 @@ class logDetailController extends Controller
      * -----------------------------------------------------------------------------------------------------
      */
 
-    public function currencyLogs(Request $request, GameLogCurrencie $Model, Action $action){
-        list($data,$total) = $action->handlePageData($Model,$request->currentPage,$request->pageNum);
+    public function currencyLogs(Request $request, GameLogCurrencie $Model){
+        list($data,$total) = app('filter')->handlePageData($Model,$request->currentPage,$request->pageNum);
         return compact('data','total');
+    }
+
+    public function currencyLogsOptions(GameLogCurrencie $Model){
+        return  app('filter')->getOptionInfo($Model);
     }
 
 }

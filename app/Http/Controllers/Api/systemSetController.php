@@ -7,7 +7,7 @@ use App\Models\Menu;
 use App\Models\UserAssets ;
 use App\Models\Rbac ;
 use App\Models\Role ;
-use App\Models\Action ;
+use App\Models\GameLogin ;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -421,7 +421,7 @@ class systemSetController extends Controller
      */
     public function allPlat(){
         // 获取所有的平台和渠道
-        $action = new Action();
+        $action = new GameLogin();
         $platChannels = $action->allPlatAndChannel();
 
         // 组装成前端约定的权限格式
