@@ -107,46 +107,49 @@ return [
                     [['post'],'/logs','mailLogs'],
                     [['post'],'/options','mailLogsOptions'],
                 ]],
+                // 以下数据量太大了，mysql目前无法胜任
 
-                ['alias'=>'升级日志','addr'=>'/detail/levelup','interface' => [
-                    [['post'],'/logs','levelupLogs'],
-                    [['post'],'/options','levelupLogsOptions'],
-                ]],
-
-                ['alias'=>'排行榜日志','addr'=>'/detail/rank','interface' => [
-                    [['post'],'/logs','rankLogs'],
-                    [['post'],'/options','rankLogsOptions'],
-                ]],
-
-                ['alias'=>'任务日志','addr'=>'/detail/task','interface' => [
-                    [['post'],'/logs','taskLogs'],
-                    [['post'],'/options','taskLogsOptions'],
-                ]],
-
-                ['alias'=>'掉落日志','addr'=>'/detail/drop','interface' => [
-                    [['post'],'/logs','dropLogs'],
-                    [['post'],'/options','dropLogsOptions'],
-                ]],
-
-                ['alias'=>'在线日志','addr'=>'/detail/online','interface' => [
-                    [['post'],'/logs','onlineLogs'],
-                    [['post'],'/options','onlineLogsOptions'],
-                ]],
-
-                ['alias'=>'物品日志','addr'=>'/detail/virtualitems','interface' => [
-                    [['post'],'/logs','virtualitemsLogs'],
-                    [['post'],'/options','virtualitemsLogsOptions'],
-                ]],
+//                ['alias'=>'升级日志','addr'=>'/detail/levelup','interface' => [
+//                    [['post'],'/logs','levelupLogs'],
+//                    [['post'],'/options','levelupLogsOptions'],
+//                ]],
+//
+//                ['alias'=>'排行榜日志','addr'=>'/detail/rank','interface' => [
+//                    [['post'],'/logs','rankLogs'],
+//                    [['post'],'/options','rankLogsOptions'],
+//                ]],
+//
+//                ['alias'=>'任务日志','addr'=>'/detail/task','interface' => [
+//                    [['post'],'/logs','taskLogs'],
+//                    [['post'],'/options','taskLogsOptions'],
+//                ]],
+//
+//                ['alias'=>'掉落日志','addr'=>'/detail/drop','interface' => [
+//                    [['post'],'/logs','dropLogs'],
+//                    [['post'],'/options','dropLogsOptions'],
+//                ]],
+//
+//                ['alias'=>'在线日志','addr'=>'/detail/online','interface' => [
+//                    [['post'],'/logs','onlineLogs'],
+//                    [['post'],'/options','onlineLogsOptions'],
+//                ]],
+//
+//                ['alias'=>'物品日志','addr'=>'/detail/virtualitems','interface' => [
+//                    [['post'],'/logs','virtualitemsLogs'],
+//                    [['post'],'/options','virtualitemsLogsOptions'],
+//                ]],
 
 //                ['alias'=>'物品日志','addr'=>'/detail/item','interface' => [
 //                    [['post'],'/logs','itemLogs'],
 //                    [['post'],'/options','itemLogsOptions'],
 //                ]],
 
-                ['alias'=>'货币日志','addr'=>'/detail/currencyLogs','interface' => [
-                    [['post'],'/logs','currencyLogs'],
-                    [['post'],'/options','currencyLogsOptions'],
-                ]],
+            // 5百万数据量数据库已经不行了
+
+//                ['alias'=>'货币日志','addr'=>'/detail/currencyLogs','interface' => [
+//                    [['post'],'/logs','currencyLogs'],
+//                    [['post'],'/options','currencyLogsOptions'],
+//                ]],
 
                 ['alias'=>'聊天日志','addr'=>'/detail/chatLogs','interface' => [
                     [['post'],'/logs','chatLogs'],

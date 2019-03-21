@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Http\Scopes\ExcludeEmpty;
+use App\Http\Scopes\ExcludeEmptyMail;
 
 class GameLogMail extends Model
 {
@@ -25,7 +25,7 @@ class GameLogMail extends Model
     {
         parent::boot();
 
-        static::addGlobalScope(new ExcludeEmpty);
+        static::addGlobalScope(new ExcludeEmptyMail);
     }
 
 }

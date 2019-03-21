@@ -151,6 +151,7 @@ class PlatPermission
             // 为多天时间选择
             $arrayWhere = [];
             foreach (explode(',',$rangeTime) as $tempDayTime){
+                // todo 或者使用mysql的 date 函数
                 list($startTime,$endTime) = $this->formatDayTime($tempDayTime);
                 $arrayWhere [] = '(generatetime >= "'.$startTime .'" and generatetime < "'.$endTime.'")' ;
             }
