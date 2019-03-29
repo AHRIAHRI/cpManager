@@ -226,6 +226,11 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        // 自定义的门面
+        'RequestFilter' => App\Http\Facade\RequestFilter::class,
+        'Data' => App\Http\Facade\Data::class,
+        'General' => App\Http\Facade\General::class,
+
     ],
 
 ];

@@ -24,7 +24,12 @@ return [
                         [['post','get'],'/lev','contlylev'],
                     ]
                 ],
-                ['alias'=>'统计数据','addr'=>'/data/countUp','interface' => []],
+                ['alias'=>'统计数据','addr'=>'/data/countUp','interface' =>
+                    [
+                        [['post','get'],'/data','countUpData'],
+                        [['post','get'],'/options','countUpDataOptions'],
+                    ]
+                ],
                 ['alias'=>'注册付费','addr'=>'/data/game','interface' => []],
                 ['alias'=>'平台数据','addr'=>'/data/plat','interface' => []],
                 ['alias'=>'渠道数据','addr'=>'/data/channel','interface' => []],
@@ -207,7 +212,7 @@ return [
                         [['post','get'],'/set','one1'],
                     ]
                 ],
-//                ['alias'=>'测试2','addr'=>'/test/two','interface' => []],
+                ['alias'=>'测试2','addr'=>'/test/two','interface' => []],
                 ['alias'=>'测试3','addr'=>'/test/three','interface' => []],
                 ['alias'=>'测试4','addr'=>'/test/four','interface' => []],
                 ['alias'=>'接口预览','addr'=>'/test/interface','interface' => []],

@@ -24,7 +24,7 @@ class ExcludeEmpty implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        return $builder->where([['serverid','<>',0],['accountid',"<>",''],['roleid',"<>",''],['channel',"<>",''],['plat',"<>",'']]);
+        return $builder->where([['serverid','<',1999],['serverid','<>',0],['accountid',"<>",''],['roleid',"<>",''],['channel',"<>",''],['plat',"<>",'']]);
     }
 }
 

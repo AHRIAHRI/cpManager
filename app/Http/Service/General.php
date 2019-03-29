@@ -7,7 +7,8 @@
  */
 namespace App\Http\Service;
 
-
+use DB ;
+use App\Models\Rbac;
 class General
 {
     /**
@@ -33,6 +34,11 @@ class General
             }
         }
         return $userAssetsModels ;
+    }
+
+    public function runRawSQL($sql){
+        $rbac  = new Rbac();
+        return DB::connection($rbac->selectProject())->select($sql);
     }
 
 }

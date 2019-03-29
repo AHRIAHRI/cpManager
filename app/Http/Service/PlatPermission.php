@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class PlatPermission
  * @package App\Http\Service
  * 处理用户的输入，渠道权限控制过滤
+ * TODO 这里不应该直接放回SQL的控制，应该返回用户的选择， 应该由一个处理选择转化成SQL的类
  *
  */
 class PlatPermission
@@ -55,19 +56,50 @@ class PlatPermission
      */
     public function userMaxSQLwhereTerms(){
         // 这里不可能为空,如果为空，中间件验证都没通过
-        $maxPermission = request()->user()->userAssets->userPlatChannelPermission();
+        $maxPermission = $this->userMax();
         if( 'all' == $maxPermission ){
             return '1 = 1';
         };
         $return = [];
-        foreach ($maxPermission as $tempPlat => $tempChannel){
-            if( 'all' == $tempChannel){
-                $return[] = ' plat = "'. $tempPlat.'"';
-            }else{
-                $return[] = '(plat = "'. $tempPlat. '" and channel in ( "'.implode( '","',$tempChannel).'" ))';
+        if(!empty($maxPermission['allPlat'])){
+            foreach ($maxPermission['allPlat'] as $tempPlat1){
+                $return[] = ' plat = "'. $tempPlat1.'"';
             }
         }
+        if(!empty($maxPermission['notAllPlat'])){
+            foreach ($maxPermission['notAllPlat'] as $temkey2 => $tempPlat2){
+                $return[] = '(plat = "'. $temkey2. '" and channel in ( "'.implode( '","',$tempPlat2).'" ))';
+            }
+        }
+//        foreach ($maxPermission as $tempPlat => $tempChannel){
+//            if( 'all' == $tempChannel){
+//                $return[] = ' plat = "'. $tempPlat.'"';
+//            }else{
+//                $return[] = '(plat = "'. $tempPlat. '" and channel in ( "'.implode( '","',$tempChannel).'" ))';
+//            }
+//        }
         return implode(' or ',$return) ;
+    }
+
+    /**
+     * 获取用户的最大权限的数组
+     */
+    public function userMax(){
+        $maxPermission =  request()->user()->userAssets->userPlatChannelPermission();
+        // 用户开启了所有平台渠道权限
+        if('all' == $maxPermission){
+            return  'all' ;
+        }
+        $return = [] ;
+        foreach ($maxPermission as $tempPlat => $tempChannel){
+            // 平台下的所有权限
+            if( 'all' == $tempChannel){
+                $return['allPlat'][] = $tempPlat ;
+            }else{
+                $return['notAllPlat'][$tempPlat] =  $tempChannel;
+            }
+        }
+        return $return ;
     }
 
     /**
@@ -110,9 +142,30 @@ class PlatPermission
     }
 
     /**
+     * 统计栏目的权限管理
+     * 过滤选项只有平台，渠道，区服，时间
+     */
+    public function countlyTerms(){
+        if(! array_key_exists('filter',$this->inputAll) ){
+            abort(403, '没有约定的操作');
+        }
+        $filter = $this->inputAll['filter'];
+        $plat = $filter['plat'] ?? '';
+        $channel = $filter['channel'] ?? '';
+        $rawGameServerID = $filter['rawGameServerID'] ?? '';
+        $rangeTime = $filter['rangeTime'] ?? '';
+
+        $platChanel = $this->getPlatChannel($plat,$channel) ;
+        $selectRangeTime = $this->getTime($rangeTime);
+        $selectServers = $this->getRawGameServers($rawGameServerID);
+
+        return [$platChanel,$selectRangeTime,$selectServers] ;
+    }
+
+    /**
      * @param $plat
      * @param $channel
-     * 处理用户的输入平台和渠道
+     * 处理用户的输入平台和渠道 返回sql的查询语句
      */
     public function handlePlatChannel($plat,$channel){
         if(empty($plat) && empty($channel)){
@@ -139,7 +192,45 @@ class PlatPermission
         }
     }
 
-    public function haneldTime($rangeTime){
+    /**
+     * @param $plat
+     * @param $channel
+     * 处理用户的输入平台和渠道 返回数组
+     * @return string|array
+     */
+    public function getPlatChannel($plat,$channel){
+        if(empty($plat) && empty($channel)){
+            // 用户如果没有输入平台和渠道 那么默认使用最大的平台和渠道权限
+            return $this->userMax();
+        }else{
+            $parseChannel = []; // 所选择的平台+渠道
+            $return = [] ;
+            if(!empty($channel)) {
+                foreach ($channel as $item) {
+                    $info = explode('/',$item);
+                    $parseChannel[$info[0]][] = $info[1];
+                }
+                foreach ($parseChannel as $plat_1 => $channel_1){
+//                    $sqlArray[] = '(plat = "'. $plat_1. '" and channel in ( "'.implode( '","',$channel_1).'" ))';
+                    $return['notAllPlat'][$plat_1][] =  $channel_1;
+                }
+            }
+            foreach ($plat as $item2){
+                if(!in_array($item2,array_keys($parseChannel))){
+                    $return['allPlat'][] = $item2 ;
+                }
+            }
+        }
+        return $return;
+    }
+
+    /**
+     * @param $rangeTime
+     * @param int $data
+     * @return string
+     * 处理时间返回组装之后的sql
+     */
+    public function haneldTime($rangeTime, $data = 7){
         // 时间是and操作
         if($rangeTime && is_array($rangeTime)){
             // 为时间区间选择
@@ -158,10 +249,28 @@ class PlatPermission
             $timeWhere =  '('.implode(' or ',$arrayWhere).')' ;
         }elseif (empty($rangeTime)){
             // 时间没有选择
-            $startTime = $this->dayAgo(7);
+            $startTime = $this->dayAgo($data);
             $timeWhere = 'generatetime >= "'.$startTime .'"' ;
         }
         return $timeWhere ;
+    }
+
+    /**
+     * @param $rangeTime
+     * @param int $data
+     * @return array
+     * 获取用户选择的时间，默认为30天
+     */
+    public function getTime($rangeTime, $data = 30){
+        $time = [];
+        if($rangeTime && is_array($rangeTime)){
+            $time['interval'] = $rangeTime ;
+        }elseif( $rangeTime && is_string($rangeTime)){
+            $time['days'] = explode(',',$rangeTime) ;
+        }elseif (empty($rangeTime)){
+            $time['ago'] = $this->dayAgo($data);
+        }
+        return $time ;
     }
 
     /**
@@ -216,6 +325,26 @@ class PlatPermission
     }
 
     /**
+     * @param $str
+     * @return  array
+     * 处理服务器ID列表
+     * 如果没有 ,那么默认为全服
+     * ["yx1/27","yx1/28","yx1/29","yx1/30"]
+     */
+
+    public function getRawGameServers($servers){
+        $ser = [] ;
+        if($servers){
+            foreach ($servers as $server){
+                $plat = explode('/',$server)[0];
+                $serverid = explode('/',$server)[1];
+                $ser[$plat][] = (int)$serverid ;
+            }
+        }
+        return $ser ;
+    }
+
+    /**
      * @param Model $model
      * @param $currentPage
      * @param int $pageNum
@@ -249,7 +378,7 @@ class PlatPermission
      */
     public function getOptionInfo(Model $model){
         // platAndChannel rawserverids max min
-        // TODO 应该懂redis中加载
+        // TODO 应该后续使用契约
         $data = [
             'platAndChannel'=>[],
             'serverIDs' => [],
@@ -296,6 +425,38 @@ class PlatPermission
                 $data['lvMax'] = $item->max;
             }
         }
+        return $data;
+    }
+
+
+    // TODO 这里后续需要修改使用契约
+    public function getSimpleOption(Model $model){
+        $data = [
+            'platAndChannel'=>[],
+            'rawServerIDs' => [],
+        ];
+        $result = $model->whereRaw($this->userMaxSQLwhereTerms())
+            ->selectRaw('plat,channel,rawserverid')
+            ->groupBy(['plat','channel','rawserverid'])
+            ->get();
+        foreach ($result as $item){
+            if(!in_array($item->plat,array_keys($data['platAndChannel']))){
+                $data['platAndChannel'][$item->plat] = [];
+                $data['platAndChannel'][$item->plat][] = $item->channel;
+            }else{
+                if(!in_array($item->channel,$data['platAndChannel'][$item->plat])){
+                    $data['platAndChannel'][$item->plat][] = $item->channel;
+                }
+            }
+            if(!in_array($item->plat,array_keys($data['rawServerIDs']))) {
+                $data['rawServerIDs'][$item->plat][] = $item->rawserverid;
+            }else{
+                if (!in_array($item->rawserverid, $data['rawServerIDs'][$item->plat])) {
+                    $data['rawServerIDs'][$item->plat][] = $item->rawserverid;
+                }
+            }
+        }
+
         return $data;
     }
 
