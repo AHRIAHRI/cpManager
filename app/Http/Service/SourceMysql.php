@@ -60,8 +60,12 @@ class SourceMysql implements Data
         // 那拿到用户输入的项
         list($plat,$time,$servers) = RequestFilter::countlyTerms();
         // 运行SQL 语句
-        $res = General::runRawSQL('select * from logpay order by generatetime desc  limit 5;');
-        dump($res);
+
+        foreach ($time as $date){
+            $res = General::runRawSQL('select * from logpay order by generatetime desc  limit 5;');
+
+        }
+
         return  [$plat,$time,$servers] ;
     }
 }

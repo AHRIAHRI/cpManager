@@ -48,6 +48,17 @@ class PlatPermission
         return [$data1.' 00:00:00' ,$date->addDays(1)->toDateTimeString()];
     }
 
+    public function diffTimeDays($time1,$time2){
+        $st = new Carbon($time1);
+        $ed = new Carbon($time2);
+        $return = [];
+        while ($st->lte($ed)){
+            $return[] = $st->toDateString();
+            $st = $st->addDay();
+        }
+        return $return ;
+    }
+
 
 
     /**
@@ -260,15 +271,22 @@ class PlatPermission
      * @param int $data
      * @return array
      * 获取用户选择的时间，默认为30天
+     * 这里应该返回时间的数组 以为时间都是天来计算的如果没有那么默认返回30天
      */
     public function getTime($rangeTime, $data = 30){
         $time = [];
         if($rangeTime && is_array($rangeTime)){
             $time['interval'] = $rangeTime ;
+            // 开始和结束时间计算出中间包含多少天的数组
+            $startTime = $rangeTime[0];
+            $endTime = $rangeTime[1];
+            $time = $this->diffTimeDays($startTime,$endTime);
+
         }elseif( $rangeTime && is_string($rangeTime)){
-            $time['days'] = explode(',',$rangeTime) ;
+            $time = explode(',',$rangeTime) ;
         }elseif (empty($rangeTime)){
-            $time['ago'] = $this->dayAgo($data);
+            $this->dayAgo($data);
+            $time = $this->diffTimeDays($this->dayAgo($data),Carbon::now()->toDateString());
         }
         return $time ;
     }
